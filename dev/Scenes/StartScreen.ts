@@ -23,8 +23,7 @@ class StartScreen {
         this.createMenu();
 
         // New cloud
-        let cloud1 = new Cloud(this.scene);
-        cloud1.delay('200ms').show();
+        new Clouds(this.scene);
         
     }
     
@@ -36,9 +35,15 @@ class StartScreen {
         this.menu.className = "gameMenu animated fadeInDown";
         this.menu.style.animationDelay = "600ms";
 
+        let logo = document.createElement("img");
+        logo.src = "./images/logo.png";
+        logo.className = "logo animated fadeIn";
+
+        this.menu.appendChild(logo); 
+
         // Add start button
         this.menu.appendChild(this.startButton());
-        this.menu.appendChild(this.creditsButton());
+        this.menu.appendChild(this.creditsButton()); 
 
         this.scene.appendChild(this.menu);
     }

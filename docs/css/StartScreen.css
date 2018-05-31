@@ -8,13 +8,20 @@ startscreen
     top: 0;
 }
 
+startscreen .logo 
+{
+    display: block;
+    position: relative;
+    margin: 0px auto;
+}
+
 
 startscreen .gameMenu
 {
     left: 50%;
     top: 50%;
     margin-left: -200px;
-    margin-top: -150px;
+    margin-top: -300px;
 
     width: 400px;
     
@@ -32,6 +39,7 @@ startscreen .gameMenu a
     height: 70px;
     line-height: 70px;
     transition: 200ms;
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 startscreen .gameMenu a:hover

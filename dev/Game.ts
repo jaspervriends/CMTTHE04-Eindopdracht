@@ -1,13 +1,22 @@
-/// <reference path="ball.ts"/>
+
 
 class Game {
     
     private screen:any;
+    themeMusic:HTMLAudioElement;
 
     constructor() {
         this.menu();
 
-        this.gameLoop()        
+        this.gameLoop()
+
+        this.themeMusic = this.playThemeMusic();
+        
+            document.body.appendChild(this.themeMusic);
+        
+        setTimeout(() => {
+            this.themeMusic.play();
+        }, 500);
     }
     
     private gameLoop():void{
@@ -15,6 +24,17 @@ class Game {
 
         requestAnimationFrame(() => this.gameLoop())
 
+    }
+
+    // Theme music
+    private playThemeMusic()
+    {
+        let music = document.createElement("audio");
+        music.src = "./sounds/theme.mp3";
+        music.loop = true;
+        music.autoplay = true;
+        
+        return music;
     }
 
     private clear()
