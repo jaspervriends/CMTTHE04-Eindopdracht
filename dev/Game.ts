@@ -44,7 +44,7 @@ class Game {
 
     private clear()
     {
-        this.game.innerHTML = "";
+        // this.game.innerHTML = "";
     }
 
     public start()

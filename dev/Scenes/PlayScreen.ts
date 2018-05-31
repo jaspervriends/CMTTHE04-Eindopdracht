@@ -1,14 +1,19 @@
 class PlayScreen {
 
-    game:Game
-
-    private ships: Ship[] = []
-
-    private playerHealth = 100;
-
+    game:Game;
+    private scene: HTMLElement;
 
     constructor(g:Game) {
         this.game = g;
+
+        // Scene element
+        this.scene = document.createElement("playscreen");
+        this.scene.className = "animated fadeInUp";
+
+        // Append child to the body
+        g.game.appendChild(this.scene);
+
+        this.scene.innerHTML = "DIT KOMT LATER!";
     }
 
     public update(): void {

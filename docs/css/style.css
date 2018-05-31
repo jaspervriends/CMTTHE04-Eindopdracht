@@ -5,7 +5,10 @@ html, body {
 
 body {
     font-family: 'Bowlby One SC', cursive;
-    background: #000000;
+    background: #ffffff;
+
+    margin: 0;
+    padding: 0;
 }
 
 body * {
@@ -16,11 +19,15 @@ body * {
 
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none;
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+}
 
+game {
+    height: 100%;
+    width: 100%;
 }
 
 ship

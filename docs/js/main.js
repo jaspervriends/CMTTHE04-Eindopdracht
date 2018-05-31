@@ -25,7 +25,6 @@ var Game = (function () {
         return music;
     };
     Game.prototype.clear = function () {
-        this.game.innerHTML = "";
     };
     Game.prototype.start = function () {
         this.clear();
@@ -157,9 +156,11 @@ var GameOverScreen = (function () {
 }());
 var PlayScreen = (function () {
     function PlayScreen(g) {
-        this.ships = [];
-        this.playerHealth = 100;
         this.game = g;
+        this.scene = document.createElement("playscreen");
+        this.scene.className = "animated fadeInUp";
+        g.game.appendChild(this.scene);
+        this.scene.innerHTML = "DIT KOMT LATER!";
     }
     PlayScreen.prototype.update = function () {
     };
@@ -170,7 +171,7 @@ var StartScreen = (function () {
         this.game = g;
         this.scene = document.createElement("startscreen");
         this.scene.className = "animated fadeIn";
-        document.body.appendChild(this.scene);
+        g.game.appendChild(this.scene);
         var island = new Island(this.scene, '');
         island.position(300, 250).show();
         var island2 = new Island(this.scene, 'second');
@@ -210,9 +211,10 @@ var StartScreen = (function () {
         var _this = this;
         new Woosh('scene');
         this.scene.className = "animated fadeOutUp";
+        this.game.start();
         setTimeout(function () {
-            _this.game.start();
-        }, 1000);
+            _this.scene.remove();
+        }, 750);
     };
     StartScreen.prototype.showCredits = function () {
     };

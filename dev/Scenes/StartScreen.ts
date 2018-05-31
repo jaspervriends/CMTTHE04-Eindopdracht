@@ -1,7 +1,7 @@
 class StartScreen {
 
     private scene: HTMLElement;
-    private menu: HTMLElement;
+    private menu: any;
     private game : Game
 
     constructor(g:Game) {
@@ -11,7 +11,8 @@ class StartScreen {
         this.scene = document.createElement("startscreen");
         this.scene.className = "animated fadeIn";
 
-        document.body.appendChild(this.scene);
+        // Append child to the body
+        g.game.appendChild(this.scene);
 
         // Add islands
         let island = new Island(this.scene, '');
@@ -81,9 +82,11 @@ class StartScreen {
         this.scene.className = "animated fadeOutUp";
 
 
+        this.game.start();
+
         setTimeout(() => {
-            this.game.start();
-        }, 1000);
+            this.scene.remove();
+        }, 750);
     }
 
     private showCredits()
