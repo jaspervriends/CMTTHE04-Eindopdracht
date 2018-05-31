@@ -1,0 +1,66 @@
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Bowlby One SC', cursive;
+    background: #000000;
+}
+
+body * {
+    position: absolute;
+    display: block;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+
+}
+
+ship
+{
+    /* background-color:  */
+}
+
+cloud
+{
+    background: url('../images/cloud_2.png') no-repeat;
+    background-size: 100% auto;
+    width: 300px;
+    height: 250px;
+}
+
+island
+{
+    width: 300px;
+    height: 300px;
+    margin-left: -150px;
+}
+
+island:after{
+    content: "";
+    display: block;
+    background: url('../images/island_1.png') no-repeat;
+    background-size: 100% auto;
+    width: 300px;
+    height: 300px;
+}
+
+island.second:after
+{
+    background-image: url('../images/island_2.png');
+}
+
+.mirrored, .mirrored:after {
+    -moz-transform: scaleX(-1);    /* Gecko */
+    -o-transform: scaleX(-1);      /* Opera */
+    -webkit-transform: scaleX(-1); /* Webkit */
+    transform: scaleX(-1);         /* Standard */
+    filter: FlipH;                 /* IE 6/7/8 */  
+}

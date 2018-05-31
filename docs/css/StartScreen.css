@@ -1,0 +1,41 @@
+startscreen
+{
+    background: #36a0dc;
+    display: block;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+}
+
+
+startscreen .gameMenu
+{
+    left: 50%;
+    top: 50%;
+    margin-left: -200px;
+    margin-top: -150px;
+
+    width: 400px;
+    
+
+    color: #FFFFFF;
+    font-size: 30px;
+    text-align: center;
+}
+
+startscreen .gameMenu a
+{
+    display: block;
+    position: relative;
+    cursor: pointer;
+    height: 70px;
+    line-height: 70px;
+    transition: 200ms;
+}
+
+startscreen .gameMenu a:hover
+{
+    font-size: 40px;
+    text-shadow: 10px 10px 0 rgba(0, 0, 0, 0.3);
+}
