@@ -4,15 +4,20 @@ class Game {
     
     private screen:any;
     themeMusic:HTMLAudioElement;
+    game:HTMLElement;
 
     constructor() {
+        this.game = document.createElement("game");
+
         this.menu();
 
         this.gameLoop()
 
+
         this.themeMusic = this.playThemeMusic();
         
-            document.body.appendChild(this.themeMusic);
+        document.body.appendChild(this.themeMusic);
+        document.body.appendChild(this.game);
         
         setTimeout(() => {
             this.themeMusic.play();
@@ -39,7 +44,7 @@ class Game {
 
     private clear()
     {
-        document.body.innerHTML = "";
+        this.game.innerHTML = "";
     }
 
     public start()

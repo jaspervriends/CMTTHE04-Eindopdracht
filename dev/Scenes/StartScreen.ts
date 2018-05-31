@@ -77,6 +77,7 @@ class StartScreen {
     }
 
     private startGame() {
+        new Woosh('scene');
         this.scene.className = "animated fadeOutUp";
 
 

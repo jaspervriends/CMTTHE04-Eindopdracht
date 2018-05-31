@@ -2,10 +2,12 @@
 var Game = (function () {
     function Game() {
         var _this = this;
+        this.game = document.createElement("game");
         this.menu();
         this.gameLoop();
         this.themeMusic = this.playThemeMusic();
         document.body.appendChild(this.themeMusic);
+        document.body.appendChild(this.game);
         setTimeout(function () {
             _this.themeMusic.play();
         }, 500);
@@ -23,7 +25,7 @@ var Game = (function () {
         return music;
     };
     Game.prototype.clear = function () {
-        document.body.innerHTML = "";
+        this.game.innerHTML = "";
     };
     Game.prototype.start = function () {
         this.clear();
@@ -206,6 +208,7 @@ var StartScreen = (function () {
     };
     StartScreen.prototype.startGame = function () {
         var _this = this;
+        new Woosh('scene');
         this.scene.className = "animated fadeOutUp";
         setTimeout(function () {
             _this.game.start();
@@ -214,5 +217,24 @@ var StartScreen = (function () {
     StartScreen.prototype.showCredits = function () {
     };
     return StartScreen;
+}());
+var Woosh = (function () {
+    function Woosh(type) {
+        this.object = document.createElement("audio");
+        if (type === "scene") {
+            this.object.src = "./sounds/woosh/woosh_scenechange.mp3";
+        }
+        else if (type === "start") {
+            this.object.src = "./sounds/woosh/woosh_start.mp3";
+        }
+        else {
+            this.object.src = "./sounds/woosh/woosh_backup.mp3";
+        }
+        this.object.loop = false;
+        this.object.autoplay = false;
+        this.object.play();
+        document.body.appendChild(this.object);
+    }
+    return Woosh;
 }());
 //# sourceMappingURL=main.js.map
