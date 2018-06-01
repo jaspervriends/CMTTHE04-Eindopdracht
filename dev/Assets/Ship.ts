@@ -1,18 +1,72 @@
 class Ship
 {
-    _type:String;
+    _type:string;
+
+    game:Game;
 
     element:HTMLElement;
 
-    constructor(type:string)
-    {
-        this._type = type;
+    movingUp:boolean = false;
+    movingRight:boolean = true;
 
-        this.element = this.create();
+    canonsAvailable:number = 10;
+    canons:number = 10;
+    refillSpeed:number = 0.1;
+
+    constructor(isPirate:boolean, g:Game)
+    {
+        // Pass game object
+        this.game = g;
+
+        // Set boat type
+        this._type = (isPirate ? 'pirate' : 'default');
+
+        // Create element
+        this.element = document.createElement("ship");
+
+        this.element.className = this._type;
     }
 
-    create()
+    update(x:number, y:number)
     {
-        const boat = document.createElement("");
+        this.element.style.left = x + "px";
+        this.element.style.top = y + "px";
+    }
+
+    moveLeft()
+    {
+        this.movingRight = false;
+        this.element.className = this._type;
+    }
+
+    moveRight()
+    {
+        this.movingRight = true;
+        this.element.className = this._type + " turned";
+    }
+
+    // Refill canons
+    refill()
+    {
+        if(this.canonsAvailable >= this.canons)
+        {
+            // Enough!
+            return;
+        }
+
+        this.canonsAvailable += this.refillSpeed;
+    }
+
+    // Shoot some canons
+    shoot(shootUp:boolean)
+    {
+        if(this.canonsAvailable <= 1.5)
+        {
+            return;
+        }
+
+        this.canonsAvailable--;
+        
+        this.game.bullets.push(new Bullet(this.game, shootUp, this.movingRight));
     }
 }

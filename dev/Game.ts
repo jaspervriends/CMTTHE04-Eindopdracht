@@ -2,9 +2,16 @@
 
 class Game {
     
-    private screen:any;
+    screen:any;
     themeMusic:HTMLAudioElement;
     game:HTMLElement;
+
+    key:any;
+
+    // Game bullets
+    bullets:any = [];
+
+    cannonballSound:any;
 
     constructor() {
         this.game = document.createElement("game");
@@ -13,8 +20,19 @@ class Game {
 
         this.gameLoop()
 
+        this.key = {
+            up: false,
+            down: false,
+            right: false,
+            left: false,
+            spacebar: false
+        };
+
+        this.initializeKeybinding();
+
 
         this.themeMusic = this.playThemeMusic();
+        this.cannonballSound = this.cannonInitializer();
         
         // document.body.appendChild(this.themeMusic);
         document.body.appendChild(this.game);
@@ -24,7 +42,69 @@ class Game {
         this.screen.update();
 
         requestAnimationFrame(() => this.gameLoop())
+    }
 
+    initializeKeybinding()
+    {
+        document.onkeydown = (evt) => {
+            evt = evt || window.event;
+            var charCode = evt.keyCode || evt.which;
+            
+            if(charCode === 65)
+            {
+                this.key.left = true;
+            }
+            
+            if(charCode === 87)
+            {
+                this.key.up = true;
+            }
+
+            if(charCode === 68)
+            {
+                this.key.right = true;
+            }
+
+            if(charCode === 83)
+            {
+                this.key.down = true;
+            }
+
+            if(charCode === 32)
+            {
+                this.key.spacebar = true;
+            }
+        };
+
+        document.onkeyup = (evt) => {
+            evt = evt || window.event;
+            var charCode = evt.keyCode || evt.which;
+            
+            if(charCode === 65)
+            {
+                this.key.left = false;
+            }
+
+            if(charCode === 87)
+            {
+                this.key.up = false;
+            }
+
+            if(charCode === 68)
+            {
+                this.key.right = false;
+            }
+
+            if(charCode === 83)
+            {
+                this.key.down = false;
+            }
+
+            if(charCode === 32)
+            {
+                this.key.spacebar = false;
+            }
+        };
     }
 
     // Theme music
@@ -35,7 +115,18 @@ class Game {
             autoplay: true,
             loop: true,
             volume: 1
-          });
+        });
+    }
+
+    private cannonInitializer()
+    {
+        return new Howl({
+            src: ['./sounds/cannonball.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 0.2,
+            pool: 5
+        });
     }
 
     private clear()

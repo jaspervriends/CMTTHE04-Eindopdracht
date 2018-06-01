@@ -39,7 +39,28 @@ welcome {
 
 ship
 {
-    /* background-color:  */
+    width: 200px;
+    height: 200px;
+    background: url('../images/ship_1.png') no-repeat;
+    background-size: 100% auto;
+    /* transition: 250ms ease-in top left transform; */
+    animation: ship infinite;
+    animation-duration: 4s;
+}
+
+ship.turned.default
+{
+    background-image: url('../images/ship_1_turned.png');
+}
+
+ship.pirate 
+{
+    background-image: url('../images/ship_2.png');
+}
+
+ship.turned.pirate
+{
+    background-image: url('../images/ship_2_turned.png');
 }
 
 cloud
@@ -55,6 +76,11 @@ island
     width: 300px;
     height: 300px;
     margin-left: -150px;
+}
+
+island.big, island.big:after {
+    width: 600px;
+    height: 600px;
 }
 
 island:after{
@@ -77,4 +103,36 @@ island.second:after
     -webkit-transform: scaleX(-1); /* Webkit */
     transform: scaleX(-1);         /* Standard */
     filter: FlipH;                 /* IE 6/7/8 */  
+}
+
+bullet
+{
+    width: 10px;
+    height: 10px;
+    background: url('../images/cannonball.png') no-repeat;
+
+    border-radius: 100%;
+}
+
+@keyframes ship
+{
+    0%
+    {
+        margin-top: -6px;
+        transform: rotate(1deg);
+    }
+    
+    45%
+    {
+        margin-top: 0px;
+        transform: rotate(0deg);
+    }
+    
+    
+    100%
+    {
+        margin-top: -6px;
+        transform: rotate(1deg);
+    }
+    
 }

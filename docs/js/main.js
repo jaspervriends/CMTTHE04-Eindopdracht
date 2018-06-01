@@ -1,10 +1,20 @@
 "use strict";
 var Game = (function () {
     function Game() {
+        this.bullets = [];
         this.game = document.createElement("game");
         this.menu();
         this.gameLoop();
+        this.key = {
+            up: false,
+            down: false,
+            right: false,
+            left: false,
+            spacebar: false
+        };
+        this.initializeKeybinding();
         this.themeMusic = this.playThemeMusic();
+        this.cannonballSound = this.cannonInitializer();
         document.body.appendChild(this.game);
     }
     Game.prototype.gameLoop = function () {
@@ -12,12 +22,62 @@ var Game = (function () {
         this.screen.update();
         requestAnimationFrame(function () { return _this.gameLoop(); });
     };
+    Game.prototype.initializeKeybinding = function () {
+        var _this = this;
+        document.onkeydown = function (evt) {
+            evt = evt || window.event;
+            var charCode = evt.keyCode || evt.which;
+            if (charCode === 65) {
+                _this.key.left = true;
+            }
+            if (charCode === 87) {
+                _this.key.up = true;
+            }
+            if (charCode === 68) {
+                _this.key.right = true;
+            }
+            if (charCode === 83) {
+                _this.key.down = true;
+            }
+            if (charCode === 32) {
+                _this.key.spacebar = true;
+            }
+        };
+        document.onkeyup = function (evt) {
+            evt = evt || window.event;
+            var charCode = evt.keyCode || evt.which;
+            if (charCode === 65) {
+                _this.key.left = false;
+            }
+            if (charCode === 87) {
+                _this.key.up = false;
+            }
+            if (charCode === 68) {
+                _this.key.right = false;
+            }
+            if (charCode === 83) {
+                _this.key.down = false;
+            }
+            if (charCode === 32) {
+                _this.key.spacebar = false;
+            }
+        };
+    };
     Game.prototype.playThemeMusic = function () {
         return new Howl({
             src: ['./sounds/theme.mp3'],
             autoplay: true,
             loop: true,
             volume: 1
+        });
+    };
+    Game.prototype.cannonInitializer = function () {
+        return new Howl({
+            src: ['./sounds/cannonball.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 0.2,
+            pool: 5
         });
     };
     Game.prototype.clear = function () {
@@ -42,6 +102,44 @@ window.addEventListener("load", function () {
         document.querySelector("welcome").className = "animated fadeOutUp";
     });
 });
+var Bullet = (function () {
+    function Bullet(g, up, right) {
+        this._speed = 1.2;
+        this._up = false;
+        this._right = true;
+        this._x = 0;
+        this._y = 0;
+        this.game = g;
+        this._up = up;
+        this._right = right;
+        this.element = document.createElement("bullet");
+        if (up) {
+            this.element.style.zIndex = "5";
+        }
+        else {
+            this.element.style.zIndex = "8";
+        }
+        var randomPosition = Math.random();
+        this._x = this.game.screen.player._x + 40 + (randomPosition * 80);
+        this._y = this.game.screen.player._y + 120 + (randomPosition * 40);
+        this.game.screen.scene.appendChild(this.element);
+        this.game.cannonballSound.play();
+    }
+    Bullet.prototype.update = function () {
+        this._y += this._up ? -this._speed : this._speed;
+        if (this._up) {
+            this._x += this._right ? this._speed : -this._speed;
+        }
+        else {
+            this._x += this._right ? -this._speed : this._speed;
+        }
+        this.element.style.top = this._y + "px";
+        this.element.style.left = this._x + "px";
+    };
+    Bullet.prototype.checkCollision = function () {
+    };
+    return Bullet;
+}());
 var Cloud = (function () {
     function Cloud(scene) {
         this.x = 0;
@@ -117,6 +215,10 @@ var Island = (function () {
         this.object.style.top = y + "px";
         return this;
     };
+    Island.prototype.big = function () {
+        this.object.className += " big";
+        return this;
+    };
     Island.prototype.delay = function (seconds) {
         this.object.style.animationDelay = seconds;
         return this;
@@ -133,19 +235,87 @@ var Island = (function () {
     return Island;
 }());
 var Player = (function () {
-    function Player() {
+    function Player(g) {
         this.health = 100;
-        this.ship = new Ship('pirate');
+        this._x = 100;
+        this._y = 100;
+        this._speed = 1;
+        this.ship = new Ship(true, g);
+        this.ship.element.style.zIndex = "7";
+        this.game = g;
     }
+    Player.prototype.speed = function (speed) {
+        this._speed = speed;
+    };
+    Player.prototype.getShip = function () {
+        return this.ship.element;
+    };
+    Player.prototype.moveLeft = function () {
+        this._x = this._x - this._speed;
+        this.ship.moveLeft();
+    };
+    Player.prototype.moveRight = function () {
+        this._x = this._x + this._speed;
+        this.ship.moveRight();
+    };
+    Player.prototype.moveUp = function () {
+        if (this._y < 100) {
+            return;
+        }
+        this.ship.movingUp = true;
+        this._y = this._y - this._speed;
+    };
+    Player.prototype.moveDown = function () {
+        if (this._y > (window.innerHeight / 2)) {
+            return;
+        }
+        this.ship.movingUp = false;
+        this._y = this._y + this._speed;
+    };
+    Player.prototype.shoot = function () {
+        this.ship.shoot(false);
+    };
+    Player.prototype.update = function () {
+        this.ship.update(this._x, this._y);
+    };
     return Player;
 }());
 var Ship = (function () {
-    function Ship(type) {
-        this._type = type;
-        this.element = this.create();
+    function Ship(isPirate, g) {
+        this.movingUp = false;
+        this.movingRight = true;
+        this.canonsAvailable = 10;
+        this.canons = 10;
+        this.refillSpeed = 0.1;
+        this.game = g;
+        this._type = (isPirate ? 'pirate' : 'default');
+        this.element = document.createElement("ship");
+        this.element.className = this._type;
     }
-    Ship.prototype.create = function () {
-        var boat = document.createElement("");
+    Ship.prototype.update = function (x, y) {
+        this.element.style.left = x + "px";
+        this.element.style.top = y + "px";
+    };
+    Ship.prototype.moveLeft = function () {
+        this.movingRight = false;
+        this.element.className = this._type;
+    };
+    Ship.prototype.moveRight = function () {
+        this.movingRight = true;
+        this.element.className = this._type + " turned";
+    };
+    Ship.prototype.refill = function () {
+        if (this.canonsAvailable >= this.canons) {
+            return;
+        }
+        this.canonsAvailable += this.refillSpeed;
+    };
+    Ship.prototype.shoot = function (shootUp) {
+        if (this.canonsAvailable <= 1.5) {
+            return;
+        }
+        this.canonsAvailable--;
+        this.game.bullets.push(new Bullet(this.game, shootUp, this.movingRight));
     };
     return Ship;
 }());
@@ -178,9 +348,35 @@ var PlayScreen = (function () {
         this.scene = document.createElement("playscreen");
         this.scene.className = "animated fadeInUp";
         g.game.appendChild(this.scene);
-        this.scene.innerHTML = "DIT KOMT LATER!";
+        this.player = new Player(g);
+        this.scene.appendChild(this.player.getShip());
+        new Clouds(this.scene);
+        var island1 = new Island(this.scene, 'first');
+        island1.position((window.innerWidth / 2 - 220), -50).big().show();
+        var island2 = new Island(this.scene, 'second');
+        island2.position(-(window.innerWidth / 2 + 140), 670).big().show();
     }
     PlayScreen.prototype.update = function () {
+        this.player.update();
+        if (this.game.key.left) {
+            this.player.moveLeft();
+        }
+        else if (this.game.key.right) {
+            this.player.moveRight();
+        }
+        if (this.game.key.up) {
+            this.player.moveUp();
+        }
+        else if (this.game.key.down) {
+            this.player.moveDown();
+        }
+        if (this.game.key.spacebar) {
+            this.player.shoot();
+        }
+        this.player.ship.refill();
+        for (var bullets = 0; bullets < this.game.bullets.length; bullets++) {
+            this.game.bullets[bullets].update();
+        }
     };
     return PlayScreen;
 }());

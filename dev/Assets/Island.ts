@@ -33,6 +33,13 @@ class Island
         return this;
     }
 
+    big()
+    {
+        this.object.className += " big";
+
+        return this;
+    }
+
     delay(seconds:string)
     {
         this.object.style.animationDelay = seconds;
