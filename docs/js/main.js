@@ -1,16 +1,11 @@
 "use strict";
 var Game = (function () {
     function Game() {
-        var _this = this;
         this.game = document.createElement("game");
         this.menu();
         this.gameLoop();
         this.themeMusic = this.playThemeMusic();
-        document.body.appendChild(this.themeMusic);
         document.body.appendChild(this.game);
-        setTimeout(function () {
-            _this.themeMusic.play();
-        }, 500);
     }
     Game.prototype.gameLoop = function () {
         var _this = this;
@@ -18,11 +13,12 @@ var Game = (function () {
         requestAnimationFrame(function () { return _this.gameLoop(); });
     };
     Game.prototype.playThemeMusic = function () {
-        var music = document.createElement("audio");
-        music.src = "./sounds/theme.mp3";
-        music.loop = true;
-        music.autoplay = true;
-        return music;
+        return new Howl({
+            src: ['./sounds/theme.mp3'],
+            autoplay: true,
+            loop: true,
+            volume: 1
+        });
     };
     Game.prototype.clear = function () {
     };
@@ -40,7 +36,12 @@ var Game = (function () {
     };
     return Game;
 }());
-window.addEventListener("load", function () { return new Game(); });
+window.addEventListener("load", function () {
+    document.querySelector("welcome").addEventListener("click", function () {
+        new Game();
+        document.querySelector("welcome").className = "animated fadeOutUp";
+    });
+});
 var Cloud = (function () {
     function Cloud(scene) {
         this.x = 0;
@@ -95,6 +96,11 @@ var Clouds = (function () {
     }
     return Clouds;
 }());
+var Healthbar = (function () {
+    function Healthbar() {
+    }
+    return Healthbar;
+}());
 var Island = (function () {
     function Island(scene, className) {
         this.scene = scene;
@@ -126,9 +132,21 @@ var Island = (function () {
     };
     return Island;
 }());
-var Ship = (function () {
-    function Ship() {
+var Player = (function () {
+    function Player() {
+        this.health = 100;
+        this.ship = new Ship('pirate');
     }
+    return Player;
+}());
+var Ship = (function () {
+    function Ship(type) {
+        this._type = type;
+        this.element = this.create();
+    }
+    Ship.prototype.create = function () {
+        var boat = document.createElement("");
+    };
     return Ship;
 }());
 var GameOverScreen = (function () {

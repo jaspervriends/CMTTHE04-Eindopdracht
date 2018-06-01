@@ -16,12 +16,8 @@ class Game {
 
         this.themeMusic = this.playThemeMusic();
         
-        document.body.appendChild(this.themeMusic);
+        // document.body.appendChild(this.themeMusic);
         document.body.appendChild(this.game);
-        
-        setTimeout(() => {
-            this.themeMusic.play();
-        }, 500);
     }
     
     private gameLoop():void{
@@ -34,12 +30,12 @@ class Game {
     // Theme music
     private playThemeMusic()
     {
-        let music = document.createElement("audio");
-        music.src = "./sounds/theme.mp3";
-        music.loop = true;
-        music.autoplay = true;
-        
-        return music;
+        return new Howl({
+            src: ['./sounds/theme.mp3'],
+            autoplay: true,
+            loop: true,
+            volume: 1
+          });
     }
 
     private clear()
@@ -70,4 +66,10 @@ class Game {
 } 
 
 
-window.addEventListener("load", () => new Game())
+window.addEventListener("load", () => {
+    document.querySelector("welcome").addEventListener("click", () => {
+        new Game();
+
+        document.querySelector("welcome").className = "animated fadeOutUp";
+    });
+})
