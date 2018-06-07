@@ -5,6 +5,11 @@ class PlayScreen {
 
     player:Player;
 
+    enemy:Enemy;
+
+    // Stats
+    canonsLeft:HTMLElement;
+
     constructor(g:Game) {
         this.game = g;
 
@@ -19,6 +24,10 @@ class PlayScreen {
 
         this.scene.appendChild(this.player.getShip());
 
+        this.enemy = new Enemy(g);
+
+        this.scene.appendChild(this.enemy.getShip());
+
         // New cloud
         new Clouds(this.scene);
 
@@ -27,6 +36,13 @@ class PlayScreen {
 
         let island2 = new Island(this.scene, 'second');
         island2.position(-(window.innerWidth / 2 + 140), 670).big().show();
+
+
+        this.canonsLeft = document.createElement("div");
+        this.canonsLeft.className = "canons-left";
+        this.canonsLeft.innerHTML = "10";
+
+        this.scene.appendChild(this.canonsLeft);
     }
 
     // Check keys and update bullets
@@ -34,6 +50,8 @@ class PlayScreen {
 
         // Player update
         this.player.update();
+
+        this.enemy.update();
 
         // Key actions
         if(this.game.key.left)
@@ -61,6 +79,9 @@ class PlayScreen {
 
         // Refill the ship
         this.player.ship.refill();
+
+        let available = Math.floor(this.player.ship.canonsAvailable);
+        this.canonsLeft.innerHTML = (available < 10 ? "0" + String(available) : available) +  " kanonnen over";
 
         for(let bullets = 0; bullets < this.game.bullets.length; bullets++)
         {

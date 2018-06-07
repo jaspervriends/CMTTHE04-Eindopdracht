@@ -11,7 +11,7 @@ class Ship
 
     canonsAvailable:number = 10;
     canons:number = 10;
-    refillSpeed:number = 0.1;
+    refillSpeed:number = 0.05;
 
     constructor(isPirate:boolean, g:Game)
     {

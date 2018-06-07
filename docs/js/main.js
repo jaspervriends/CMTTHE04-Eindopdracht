@@ -27,16 +27,16 @@ var Game = (function () {
         document.onkeydown = function (evt) {
             evt = evt || window.event;
             var charCode = evt.keyCode || evt.which;
-            if (charCode === 65) {
+            if (charCode === 65 || charCode === 37) {
                 _this.key.left = true;
             }
-            if (charCode === 87) {
+            if (charCode === 87 || charCode === 38) {
                 _this.key.up = true;
             }
-            if (charCode === 68) {
+            if (charCode === 68 || charCode === 39) {
                 _this.key.right = true;
             }
-            if (charCode === 83) {
+            if (charCode === 83 || charCode === 40) {
                 _this.key.down = true;
             }
             if (charCode === 32) {
@@ -46,16 +46,17 @@ var Game = (function () {
         document.onkeyup = function (evt) {
             evt = evt || window.event;
             var charCode = evt.keyCode || evt.which;
-            if (charCode === 65) {
+            console.log(charCode);
+            if (charCode === 65 || charCode === 37) {
                 _this.key.left = false;
             }
-            if (charCode === 87) {
+            if (charCode === 87 || charCode === 38) {
                 _this.key.up = false;
             }
-            if (charCode === 68) {
+            if (charCode === 68 || charCode === 39) {
                 _this.key.right = false;
             }
-            if (charCode === 83) {
+            if (charCode === 83 || charCode === 40) {
                 _this.key.down = false;
             }
             if (charCode === 32) {
@@ -103,15 +104,18 @@ window.addEventListener("load", function () {
     });
 });
 var Bullet = (function () {
-    function Bullet(g, up, right) {
+    function Bullet(g, up, left) {
         this._speed = 1.2;
+        this._range = 200;
+        this._startPoint = 0;
         this._up = false;
-        this._right = true;
+        this._left = true;
         this._x = 0;
         this._y = 0;
+        this._vissible = true;
         this.game = g;
         this._up = up;
-        this._right = right;
+        this._left = left;
         this.element = document.createElement("bullet");
         if (up) {
             this.element.style.zIndex = "5";
@@ -120,21 +124,51 @@ var Bullet = (function () {
             this.element.style.zIndex = "8";
         }
         var randomPosition = Math.random();
-        this._x = this.game.screen.player._x + 40 + (randomPosition * 80);
-        this._y = this.game.screen.player._y + 120 + (randomPosition * 40);
+        if (this._left) {
+            this._x = this.game.screen.player._x + 40 + (randomPosition * 80);
+            this._y = this.game.screen.player._y + 120 + (randomPosition * 40);
+        }
+        else {
+            this._x = this.game.screen.player._x + 142 - (randomPosition * 80);
+            this._y = this.game.screen.player._y + 120 + (randomPosition * 40);
+        }
+        this._range = 170 + (Math.random() * 40);
+        this._startPoint = this._x;
         this.game.screen.scene.appendChild(this.element);
         this.game.cannonballSound.play();
     }
     Bullet.prototype.update = function () {
+        if (!this._vissible) {
+            return;
+        }
+        if (this._y < -10 || this._y > window.innerHeight || this._x > window.innerWidth || this._x < -10) {
+            this.element.remove();
+            this._vissible = false;
+            return;
+        }
         this._y += this._up ? -this._speed : this._speed;
         if (this._up) {
-            this._x += this._right ? this._speed : -this._speed;
+            this._x += this._left ? this._speed : -this._speed;
         }
         else {
-            this._x += this._right ? -this._speed : this._speed;
+            this._x += this._left ? -this._speed : this._speed;
         }
-        this.element.style.top = this._y + "px";
+        if (this._left && (this._startPoint - this._x) > this._range) {
+            this.plons();
+        }
+        else if (!this._left && (this._x - this._startPoint) > this._range) {
+            this.plons();
+        }
+        this.element.style.top = Math.floor(this._y) + "px";
         this.element.style.left = this._x + "px";
+    };
+    Bullet.prototype.plons = function () {
+        var _this = this;
+        this._vissible = false;
+        this.element.className = " splash";
+        setTimeout(function () {
+            _this.element.remove();
+        }, 1000);
     };
     Bullet.prototype.checkCollision = function () {
     };
@@ -193,6 +227,85 @@ var Clouds = (function () {
         }
     }
     return Clouds;
+}());
+var Enemy = (function () {
+    function Enemy(g) {
+        this.health = 100;
+        this._x = 100;
+        this._y = 100;
+        this._speed = 0.4;
+        this.goingUp = false;
+        this.goingDown = false;
+        this.goingRight = false;
+        this.goingLeft = false;
+        this.game = g;
+        this.ship = new Ship(false, g);
+        this._x = (window.innerWidth - 300);
+        this._y = (window.innerHeight - 300);
+        this.ship.element.style.animationDelay = Math.random() + "s";
+        this.ship.element.style.zIndex = "8";
+        this.selfThinking();
+    }
+    Enemy.prototype.speed = function (speed) {
+        this._speed = speed;
+    };
+    Enemy.prototype.getShip = function () {
+        return this.ship.element;
+    };
+    Enemy.prototype.selfThinking = function () {
+        var _this = this;
+        if (typeof this.game.screen.player === "undefined") {
+            setTimeout(function () { return _this.selfThinking(); }, 500);
+            return;
+        }
+        var playerPositionX = this.game.screen.player._x - this._x;
+        var playerPositionY = this.game.screen.player._y - this._y;
+        if (playerPositionX < -100) {
+            this.goingLeft = true;
+            this.goingRight = false;
+        }
+        else if (playerPositionX > 100) {
+            this.goingLeft = false;
+            this.goingRight = true;
+        }
+        else {
+            this.goingLeft = false;
+            this.goingRight = false;
+        }
+        if (playerPositionY < -100) {
+            this.goingUp = true;
+            this.goingDown = false;
+        }
+        else if (playerPositionY > 100) {
+            this.goingUp = false;
+            this.goingDown = true;
+        }
+        else {
+            this.goingUp = false;
+            this.goingDown = false;
+        }
+        setTimeout(function () { return _this.selfThinking(); }, 500);
+    };
+    Enemy.prototype.update = function () {
+        if (this.goingLeft) {
+            this._x = this._x - this._speed;
+            this.ship.moveLeft();
+        }
+        if (this.goingRight) {
+            this._x = this._x + this._speed;
+            this.ship.moveRight();
+        }
+        if (this.goingUp) {
+            this.ship.movingUp = true;
+            this._y = this._y - this._speed;
+        }
+        if (this.goingDown) {
+            this.ship.movingUp = false;
+            this._y = this._y + this._speed;
+        }
+        this.ship.update(this._x, this._y);
+    };
+    return Enemy;
 }());
 var Healthbar = (function () {
     function Healthbar() {
@@ -286,7 +399,7 @@ var Ship = (function () {
         this.movingRight = true;
         this.canonsAvailable = 10;
         this.canons = 10;
-        this.refillSpeed = 0.1;
+        this.refillSpeed = 0.05;
         this.game = g;
         this._type = (isPirate ? 'pirate' : 'default');
         this.element = document.createElement("ship");
@@ -350,14 +463,21 @@ var PlayScreen = (function () {
         g.game.appendChild(this.scene);
         this.player = new Player(g);
         this.scene.appendChild(this.player.getShip());
+        this.enemy = new Enemy(g);
+        this.scene.appendChild(this.enemy.getShip());
         new Clouds(this.scene);
         var island1 = new Island(this.scene, 'first');
         island1.position((window.innerWidth / 2 - 220), -50).big().show();
         var island2 = new Island(this.scene, 'second');
         island2.position(-(window.innerWidth / 2 + 140), 670).big().show();
+        this.canonsLeft = document.createElement("div");
+        this.canonsLeft.className = "canons-left";
+        this.canonsLeft.innerHTML = "10";
+        this.scene.appendChild(this.canonsLeft);
     }
     PlayScreen.prototype.update = function () {
         this.player.update();
+        this.enemy.update();
         if (this.game.key.left) {
             this.player.moveLeft();
         }
@@ -374,6 +494,8 @@ var PlayScreen = (function () {
             this.player.shoot();
         }
         this.player.ship.refill();
+        var available = Math.floor(this.player.ship.canonsAvailable);
+        this.canonsLeft.innerHTML = (available < 10 ? "0" + String(available) : available) + " kanonnen over";
         for (var bullets = 0; bullets < this.game.bullets.length; bullets++) {
             this.game.bullets[bullets].update();
         }

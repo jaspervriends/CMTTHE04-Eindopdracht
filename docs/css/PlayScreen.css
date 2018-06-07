@@ -7,3 +7,123 @@ playscreen
     bottom: 0;
     top: 0;
 }
+
+/* Stats */
+.canons-left {
+    font-size: 30px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 9999;
+    color: #FFFFFF;
+    
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+/**/
+
+ship
+{
+    width: 200px;
+    height: 200px;
+    background: url('../images/ship_1.png') no-repeat;
+    background-size: 100% auto;
+    /* transition: 250ms ease-in top left transform; */
+    animation: ship infinite;
+    animation-duration: 4s;
+}
+
+ship.turned.default
+{
+    background-image: url('../images/ship_1_turned.png');
+}
+
+ship.pirate 
+{
+    background-image: url('../images/ship_2.png');
+}
+
+ship.turned.pirate
+{
+    background-image: url('../images/ship_2_turned.png');
+}
+
+bullet
+{
+    width: 10px;
+    height: 10px;
+    background: url('../images/cannonball.png') no-repeat;
+
+    border-radius: 100%;
+}
+
+bullet.splash
+{
+    background-image: url('../images/splash/1.png');
+
+    width: 75px;
+    height: 75px;
+
+    margin-left: -25px;
+    margin-top: -25px;
+    display: block;
+    animation: splash 1s;
+}
+
+@keyframes ship
+{
+    0%
+    {
+        margin-top: -6px;
+        transform: rotate(1deg);
+    }
+    
+    45%
+    {
+        margin-top: 0px;
+        transform: rotate(0deg);
+    }
+    
+    
+    100%
+    {
+        margin-top: -6px;
+        transform: rotate(1deg);
+    }
+    
+}
+
+@keyframes splash
+{
+    0%
+    {
+        background-image: url('../images/splash/1.png');
+    }
+    
+    20%
+    {
+        background-image: url('../images/splash/2.png');
+    }
+    
+    40%
+    {
+        background-image: url('../images/splash/3.png');
+    }
+    
+    60%
+    {
+        background-image: url('../images/splash/4.png');
+    }
+    
+    80%
+    {
+        background-image: url('../images/splash/5.png');
+    }
+    
+    
+    100%
+    {
+        background-image: url('../images/splash/6.png');
+    }
+    
+}

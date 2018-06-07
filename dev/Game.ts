@@ -50,22 +50,22 @@ class Game {
             evt = evt || window.event;
             var charCode = evt.keyCode || evt.which;
             
-            if(charCode === 65)
+            if(charCode === 65 || charCode === 37)
             {
                 this.key.left = true;
             }
             
-            if(charCode === 87)
+            if(charCode === 87 || charCode === 38)
             {
                 this.key.up = true;
             }
 
-            if(charCode === 68)
+            if(charCode === 68 || charCode === 39)
             {
                 this.key.right = true;
             }
 
-            if(charCode === 83)
+            if(charCode === 83 || charCode === 40)
             {
                 this.key.down = true;
             }
@@ -79,23 +79,25 @@ class Game {
         document.onkeyup = (evt) => {
             evt = evt || window.event;
             var charCode = evt.keyCode || evt.which;
+
+            console.log(charCode);
             
-            if(charCode === 65)
+            if(charCode === 65 || charCode === 37)
             {
                 this.key.left = false;
             }
 
-            if(charCode === 87)
+            if(charCode === 87 || charCode === 38)
             {
                 this.key.up = false;
             }
 
-            if(charCode === 68)
+            if(charCode === 68 || charCode === 39)
             {
                 this.key.right = false;
             }
 
-            if(charCode === 83)
+            if(charCode === 83 || charCode === 40)
             {
                 this.key.down = false;
             }
