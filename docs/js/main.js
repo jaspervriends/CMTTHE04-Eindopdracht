@@ -104,7 +104,7 @@ window.addEventListener("load", function () {
     });
 });
 var Bullet = (function () {
-    function Bullet(g, up, left) {
+    function Bullet(g, up, left, ship) {
         this._speed = 1.2;
         this._range = 200;
         this._startPoint = 0;
@@ -114,6 +114,7 @@ var Bullet = (function () {
         this._y = 0;
         this._vissible = true;
         this.game = g;
+        this.ship = ship;
         this._up = up;
         this._left = left;
         this.element = document.createElement("bullet");
@@ -125,12 +126,12 @@ var Bullet = (function () {
         }
         var randomPosition = Math.random();
         if (this._left) {
-            this._x = this.game.screen.player._x + 40 + (randomPosition * 80);
-            this._y = this.game.screen.player._y + 120 + (randomPosition * 40);
+            this._x = ship.x + 40 + (randomPosition * 80);
+            this._y = ship.y + 120 + (randomPosition * 40);
         }
         else {
-            this._x = this.game.screen.player._x + 142 - (randomPosition * 80);
-            this._y = this.game.screen.player._y + 120 + (randomPosition * 40);
+            this._x = ship.x + 142 - (randomPosition * 80);
+            this._y = ship.y + 120 + (randomPosition * 40);
         }
         this._range = 170 + (Math.random() * 40);
         this._startPoint = this._x;
@@ -153,10 +154,10 @@ var Bullet = (function () {
         else {
             this._x += this._left ? -this._speed : this._speed;
         }
-        if (this._left && (this._startPoint - this._x) > this._range) {
+        if (!this._up && ((this._left && (this._startPoint - this._x) > this._range) || (!this._left && (this._x - this._startPoint) > this._range))) {
             this.plons();
         }
-        else if (!this._left && (this._x - this._startPoint) > this._range) {
+        else if (this._up && ((this._left && (this._x - this._startPoint) > this._range) || (!this._left && (this._startPoint - this._x) > this._range))) {
             this.plons();
         }
         this.element.style.top = Math.floor(this._y) + "px";
@@ -168,6 +169,8 @@ var Bullet = (function () {
         this.element.className = " splash";
         setTimeout(function () {
             _this.element.remove();
+            var getMe = _this.game.bullets.indexOf(_this);
+            _this.game.bullets.splice(getMe, 1);
         }, 1000);
     };
     Bullet.prototype.checkCollision = function () {
@@ -233,13 +236,15 @@ var Enemy = (function () {
         this.health = 100;
         this._x = 100;
         this._y = 100;
-        this._speed = 0.4;
+        this._speed = 0.8;
         this.goingUp = false;
         this.goingDown = false;
         this.goingRight = false;
         this.goingLeft = false;
+        this.shoot = false;
         this.game = g;
         this.ship = new Ship(false, g);
+        this.ship.refillSpeed = 0.03;
         this._x = (window.innerWidth - 300);
         this._y = (window.innerHeight - 300);
         this.ship.element.style.animationDelay = Math.random() + "s";
@@ -264,7 +269,7 @@ var Enemy = (function () {
             this.goingLeft = true;
             this.goingRight = false;
         }
-        else if (playerPositionX > 100) {
+        else if (playerPositionX > 100 || (playerPositionY > -100 && playerPositionX > -100 && playerPositionX < 0 && this.game.key.right)) {
             this.goingLeft = false;
             this.goingRight = true;
         }
@@ -272,17 +277,24 @@ var Enemy = (function () {
             this.goingLeft = false;
             this.goingRight = false;
         }
-        if (playerPositionY < -100) {
+        if (playerPositionY < -200) {
             this.goingUp = true;
             this.goingDown = false;
         }
-        else if (playerPositionY > 100) {
+        else if (playerPositionY > 100 || (playerPositionY > -100 && playerPositionY < 0 && this.game.key.down)) {
             this.goingUp = false;
             this.goingDown = true;
         }
         else {
             this.goingUp = false;
             this.goingDown = false;
+        }
+        console.log(playerPositionY);
+        if ((playerPositionX > -150 && playerPositionX < -50) || (playerPositionY > -150 && playerPositionY < -50)) {
+            this.shoot = true;
+        }
+        else {
+            this.shoot = false;
         }
         setTimeout(function () { return _this.selfThinking(); }, 500);
     };
@@ -303,6 +315,10 @@ var Enemy = (function () {
             this.ship.movingUp = false;
             this._y = this._y + this._speed;
         }
+        if (this.shoot && this.ship.canonsAvailable > 7) {
+            this.ship.shootAmount(true, 7);
+        }
+        this.ship.refill();
         this.ship.update(this._x, this._y);
     };
     return Enemy;
@@ -400,12 +416,16 @@ var Ship = (function () {
         this.canonsAvailable = 10;
         this.canons = 10;
         this.refillSpeed = 0.05;
+        this.x = 0;
+        this.y = 0;
         this.game = g;
         this._type = (isPirate ? 'pirate' : 'default');
         this.element = document.createElement("ship");
         this.element.className = this._type;
     }
     Ship.prototype.update = function (x, y) {
+        this.x = x;
+        this.y = y;
         this.element.style.left = x + "px";
         this.element.style.top = y + "px";
     };
@@ -428,7 +448,12 @@ var Ship = (function () {
             return;
         }
         this.canonsAvailable--;
-        this.game.bullets.push(new Bullet(this.game, shootUp, this.movingRight));
+        this.game.bullets.push(new Bullet(this.game, shootUp, this.movingRight, this));
+    };
+    Ship.prototype.shootAmount = function (shootUp, amount) {
+        for (var i = 0; i < amount; i++) {
+            this.shoot(shootUp);
+        }
     };
     return Ship;
 }());

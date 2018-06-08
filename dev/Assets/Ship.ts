@@ -13,6 +13,9 @@ class Ship
     canons:number = 10;
     refillSpeed:number = 0.05;
 
+    public x = 0;
+    public y = 0;
+
     constructor(isPirate:boolean, g:Game)
     {
         // Pass game object
@@ -29,6 +32,9 @@ class Ship
 
     update(x:number, y:number)
     {
+        this.x = x;
+        this.y = y;
+
         this.element.style.left = x + "px";
         this.element.style.top = y + "px";
     }
@@ -67,6 +73,15 @@ class Ship
 
         this.canonsAvailable--;
         
-        this.game.bullets.push(new Bullet(this.game, shootUp, this.movingRight));
+        this.game.bullets.push(new Bullet(this.game, shootUp, this.movingRight, this));
+    }
+
+    // Shoot directly cannons
+    shootAmount(shootUp:boolean, amount:number)
+    {
+        for(let i = 0; i < amount; i++)
+        {
+            this.shoot(shootUp);
+        }
     }
 }

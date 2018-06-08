@@ -5,7 +5,7 @@ class Enemy
 
     _x:number = 100;
     _y:number = 100;
-    _speed:number = 0.4;
+    _speed:number = 0.8;
 
     game:Game;
 
@@ -13,12 +13,15 @@ class Enemy
     goingDown:boolean = false;
     goingRight:boolean = false;
     goingLeft:boolean = false;
+    shoot:boolean = false;
 
     constructor(g:Game)
     {
         this.game = g;
         
         this.ship = new Ship(false, g);
+
+        this.ship.refillSpeed = 0.03;
 
         this._x = (window.innerWidth - 300);
         this._y = (window.innerHeight - 300);
@@ -56,7 +59,7 @@ class Enemy
         {
             this.goingLeft = true;
             this.goingRight = false;
-        }else if(playerPositionX > 100)
+        }else if(playerPositionX > 100 || (playerPositionY > -100 && playerPositionX > -100 && playerPositionX < 0 && this.game.key.right))
         {
             this.goingLeft = false;
             this.goingRight = true;
@@ -65,17 +68,27 @@ class Enemy
             this.goingRight = false;
         }
 
-        if(playerPositionY < -100)
+        if(playerPositionY < -200)
         {
             this.goingUp = true;
             this.goingDown = false;
-        }else if(playerPositionY > 100)
+        }else if(playerPositionY > 100 || (playerPositionY > -100 && playerPositionY < 0 && this.game.key.down))
         {
             this.goingUp = false;
             this.goingDown = true;
         }else{
             this.goingUp = false;
             this.goingDown = false;
+        }
+
+        console.log(playerPositionY);
+
+        // Is player in range?
+        if((playerPositionX > -150 && playerPositionX < -50) || (playerPositionY > -150 && playerPositionY < -50)) 
+        {
+            this.shoot = true;
+        }else{
+            this.shoot = false;
         }
 
         setTimeout(() => this.selfThinking(), 500);
@@ -106,6 +119,14 @@ class Enemy
             this.ship.movingUp = false;
             this._y = this._y + this._speed;
         }
+
+        // Shoot
+        if(this.shoot && this.ship.canonsAvailable > 7)
+        {
+            this.ship.shootAmount(true, 7);
+        }
+
+        this.ship.refill();
 
         this.ship.update(this._x, this._y);
     }

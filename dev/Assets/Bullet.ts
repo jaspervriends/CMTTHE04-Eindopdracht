@@ -3,6 +3,7 @@ class Bullet
 
     game:Game;
     element:HTMLElement;
+    ship:Ship;
 
     // Bullet speed
     _speed:number = 1.2;
@@ -18,9 +19,10 @@ class Bullet
 
     _vissible:boolean = true;
 
-    constructor(g:Game, up:boolean, left: boolean)
+    constructor(g:Game, up:boolean, left: boolean, ship:Ship)
     {
         this.game = g;
+        this.ship = ship;
 
         this._up = up;
         this._left = left;
@@ -37,11 +39,11 @@ class Bullet
         let randomPosition = Math.random();
 
         if(this._left) {
-            this._x = this.game.screen.player._x + 40 + (randomPosition * 80);
-            this._y = this.game.screen.player._y + 120 + (randomPosition * 40);
+            this._x = ship.x + 40 + (randomPosition * 80);
+            this._y = ship.y + 120 + (randomPosition * 40);
         }else{
-            this._x = this.game.screen.player._x + 142 - (randomPosition * 80);
-            this._y = this.game.screen.player._y + 120 + (randomPosition * 40);
+            this._x = ship.x + 142 - (randomPosition * 80);
+            this._y = ship.y + 120 + (randomPosition * 40);
         }
 
         this._range = 170 + (Math.random() * 40);
@@ -60,7 +62,7 @@ class Bullet
             return;
         }
         
-        // Do we need to hide it?
+        // Is the bullet outside the screen?
         if(this._y < -10 || this._y > window.innerHeight || this._x > window.innerWidth || this._x < -10)
         {
             this.element.remove();
@@ -68,18 +70,23 @@ class Bullet
             return;
         }
 
+        // Update Y position
         this._y += this._up ? -this._speed : this._speed;
 
+        // Update X position (left or right)
         if(this._up) {
             this._x += this._left ? this._speed : -this._speed;
         }else{
             this._x += this._left ? -this._speed : this._speed;
         }
 
-        if(this._left && (this._startPoint - this._x) > this._range)
+        // Bullets going down outside range, splash them!
+        if(!this._up && ((this._left && (this._startPoint - this._x) > this._range) || (!this._left && (this._x - this._startPoint) > this._range)))
         {
             this.plons();
-        }else if(!this._left && (this._x - this._startPoint) > this._range)
+        }
+        // Bullets going up outside range, splash them!
+        else if(this._up && ((this._left && (this._x - this._startPoint) > this._range) || (!this._left && (this._startPoint - this._x) > this._range)))
         {
             this.plons();
         }
@@ -97,6 +104,8 @@ class Bullet
 
         setTimeout(() => {
             this.element.remove();
+            let getMe = this.game.bullets.indexOf(this);
+            this.game.bullets.splice(getMe, 1);
         }, 1000);
     }
 

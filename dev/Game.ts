@@ -9,7 +9,7 @@ class Game {
     key:any;
 
     // Game bullets
-    bullets:any = [];
+    bullets:Bullet[] = [];
 
     cannonballSound:any;
 
