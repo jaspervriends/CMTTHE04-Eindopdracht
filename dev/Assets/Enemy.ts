@@ -19,60 +19,79 @@ class Enemy
     {
         this.game = g;
         
+        // Create ship
         this.ship = new Ship(false, g);
 
+        // Set refill speed
         this.ship.refillSpeed = 0.03;
 
+        // Set start position
         this._x = (window.innerWidth - 300);
         this._y = (window.innerHeight - 300);
 
+        // Set animation dilay
         this.ship.element.style.animationDelay = Math.random() + "s";
 
         // Set z-index
-        this.ship.element.style.zIndex = "8";
+        this.ship.element.style.zIndex = "70";
 
+        // Start selfthiking
         this.selfThinking();
     }
 
+    // Set boat speed
     speed(speed:number)
     {
         this._speed = speed;
     }
 
+    // Get ship
     getShip()
     {
         return this.ship.element;
     }
 
+    // Selfthinking
     selfThinking()
     {
+        // Player not ready? Let's wait!
         if(typeof this.game.screen.player === "undefined")
         {
             setTimeout(() => this.selfThinking(), 500);
             return;
         }
-
+        
+        // Player position
         let playerPositionX = this.game.screen.player._x - this._x;
         let playerPositionY = this.game.screen.player._y - this._y;
 
+        // Player at the left (and too far away from me!)
         if(playerPositionX < -100)
         {
             this.goingLeft = true;
             this.goingRight = false;
-        }else if(playerPositionX > 100 || (playerPositionY > -100 && playerPositionX > -100 && playerPositionX < 0 && this.game.key.right))
+        }
+
+        // Player at the right (or the player is too close)
+        else if(playerPositionX > 100 || (playerPositionY > -100 && playerPositionX > -100 && playerPositionX < 0 && this.game.key.right))
         {
             this.goingLeft = false;
             this.goingRight = true;
         }else{
+            // Nothing
             this.goingLeft = false;
             this.goingRight = false;
         }
 
+        // Player is higher then me and too far from me.
         if(playerPositionY < -200)
         {
+            // Let's go up
             this.goingUp = true;
             this.goingDown = false;
-        }else if(playerPositionY > 100 || (playerPositionY > -100 && playerPositionY < 0 && this.game.key.down))
+        }
+        // Player is lower then me (or the player is too close)
+        else if(playerPositionY > 100 || (playerPositionY > -100 && playerPositionY < 0 && this.game.key.down))
         {
             this.goingUp = false;
             this.goingDown = true;
@@ -81,9 +100,7 @@ class Enemy
             this.goingDown = false;
         }
 
-        console.log(playerPositionY);
-
-        // Is player in range?
+        // Is player in range? FIRE!!!
         if((playerPositionX > -150 && playerPositionX < -50) || (playerPositionY > -150 && playerPositionY < -50)) 
         {
             this.shoot = true;
@@ -94,26 +111,31 @@ class Enemy
         setTimeout(() => this.selfThinking(), 500);
     }
 
+    // Update
     update()
     {
+        // Enemy goes left
         if(this.goingLeft)
         {
             this._x = this._x - this._speed;
             this.ship.moveLeft();
         }
 
+        // Enemy goes right
         if(this.goingRight)
         {
             this._x = this._x + this._speed;
             this.ship.moveRight();
         }
 
+        // Enemy goes up
         if(this.goingUp)
         {
             this.ship.movingUp = true;
             this._y = this._y - this._speed;
         }
 
+        // Enemy goes down
         if(this.goingDown)
         {
             this.ship.movingUp = false;
@@ -126,8 +148,10 @@ class Enemy
             this.ship.shootAmount(true, 7);
         }
 
+        // Refill
         this.ship.refill();
 
+        // Update position
         this.ship.update(this._x, this._y);
     }
 }

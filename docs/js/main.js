@@ -113,10 +113,12 @@ var Bullet = (function () {
         this._x = 0;
         this._y = 0;
         this._vissible = true;
+        this.isEnemyBullet = false;
         this.game = g;
         this.ship = ship;
         this._up = up;
         this._left = left;
+        this.isEnemyBullet = ship._type != 'pirate';
         this.element = document.createElement("bullet");
         if (up) {
             this.element.style.zIndex = "5";
@@ -167,6 +169,16 @@ var Bullet = (function () {
         var _this = this;
         this._vissible = false;
         this.element.className = " splash";
+        setTimeout(function () {
+            _this.element.remove();
+            var getMe = _this.game.bullets.indexOf(_this);
+            _this.game.bullets.splice(getMe, 1);
+        }, 1000);
+    };
+    Bullet.prototype.boom = function () {
+        var _this = this;
+        this._vissible = false;
+        this.element.style.background = "#FF0000";
         setTimeout(function () {
             _this.element.remove();
             var getMe = _this.game.bullets.indexOf(_this);
@@ -248,7 +260,7 @@ var Enemy = (function () {
         this._x = (window.innerWidth - 300);
         this._y = (window.innerHeight - 300);
         this.ship.element.style.animationDelay = Math.random() + "s";
-        this.ship.element.style.zIndex = "8";
+        this.ship.element.style.zIndex = "70";
         this.selfThinking();
     }
     Enemy.prototype.speed = function (speed) {
@@ -289,7 +301,6 @@ var Enemy = (function () {
             this.goingUp = false;
             this.goingDown = false;
         }
-        console.log(playerPositionY);
         if ((playerPositionX > -150 && playerPositionX < -50) || (playerPositionY > -150 && playerPositionY < -50)) {
             this.shoot = true;
         }
@@ -422,6 +433,9 @@ var Ship = (function () {
         this._type = (isPirate ? 'pirate' : 'default');
         this.element = document.createElement("ship");
         this.element.className = this._type;
+        this.hitbox1 = this.createHitboxElements(1);
+        this.hitbox2 = this.createHitboxElements(2);
+        this.hitbox3 = this.createHitboxElements(3);
     }
     Ship.prototype.update = function (x, y) {
         this.x = x;
@@ -454,6 +468,14 @@ var Ship = (function () {
         for (var i = 0; i < amount; i++) {
             this.shoot(shootUp);
         }
+    };
+    Ship.prototype.createHitboxElements = function (nr) {
+        var hitbox = document.createElement("div");
+        hitbox.className = "hitbox_" + nr;
+        this.element.appendChild(hitbox);
+        return hitbox;
+    };
+    Ship.prototype.checkHitboxes = function () {
     };
     return Ship;
 }());
@@ -523,7 +545,20 @@ var PlayScreen = (function () {
         this.canonsLeft.innerHTML = (available < 10 ? "0" + String(available) : available) + " kanonnen over";
         for (var bullets = 0; bullets < this.game.bullets.length; bullets++) {
             this.game.bullets[bullets].update();
+            if (this.game.bullets[bullets].isEnemyBullet) {
+                if (this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox1.getBoundingClientRect()) ||
+                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox2.getBoundingClientRect()) ||
+                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox3.getBoundingClientRect())) {
+                    this.game.bullets[bullets].boom();
+                }
+            }
         }
+    };
+    PlayScreen.prototype.checkCollision = function (a, b) {
+        return (a.left <= b.right &&
+            b.left <= a.right &&
+            a.top <= b.bottom &&
+            b.top <= a.bottom);
     };
     return PlayScreen;
 }());

@@ -48,6 +48,55 @@ ship.turned.pirate
     background-image: url('../images/ship_2_turned.png');
 }
 
+ship .hitbox_1
+{
+    width: 72px;
+    height: 19px;
+    background: #FFFFFF;
+    position: absolute;
+    left: 39px;
+    top: 145px;
+}
+
+ship .hitbox_2
+{
+    width: 100px;
+    height: 20px;
+    background: #FFFFFF;
+    position: absolute;
+    left: 60px;
+    top: 125px;
+}
+
+ship .hitbox_3
+{
+    width: 80px;
+    height: 20px;
+    background: #FFFFFF;
+    position: absolute;
+    left: 110px;
+    top: 105px;
+}
+
+ship.turned .hitbox_1
+{
+    top: 116px;
+}
+
+ship.turned .hitbox_2
+{
+    left: 61px;
+    top: 135px;
+}
+
+ship.turned .hitbox_3
+{
+    width: 60px;
+    height: 11px;
+    left: 100px;
+    top: 155px;
+}
+
 bullet
 {
     width: 10px;

@@ -86,17 +86,29 @@ class PlayScreen {
         for(let bullets = 0; bullets < this.game.bullets.length; bullets++)
         {
             this.game.bullets[bullets].update();
+            
+            if(this.game.bullets[bullets].isEnemyBullet) 
+            {
+                if(
+                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox1.getBoundingClientRect()) ||
+                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox2.getBoundingClientRect()) ||
+                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox3.getBoundingClientRect())
+                )
+                {
+                    this.game.bullets[bullets].boom();
+                }
+            }
         }
 
         // console.log("Avaiable canons: " + this.player.ship.canonsAvailable);
     }
 
-    // private checkCollision(a: ClientRect, b: ClientRect) {
-    //     return (a.left <= b.right &&
-    //         b.left <= a.right &&
-    //         a.top <= b.bottom &&
-    //         b.top <= a.bottom)
-    // }
+    private checkCollision(a: ClientRect, b: ClientRect) {
+        return (a.left <= b.right &&
+            b.left <= a.right &&
+            a.top <= b.bottom &&
+            b.top <= a.bottom)
+    }
 
     // public removeHealth()
     // {

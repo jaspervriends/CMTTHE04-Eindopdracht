@@ -16,6 +16,10 @@ class Ship
     public x = 0;
     public y = 0;
 
+    public hitbox1;
+    public hitbox2;
+    public hitbox3;
+
     constructor(isPirate:boolean, g:Game)
     {
         // Pass game object
@@ -28,6 +32,10 @@ class Ship
         this.element = document.createElement("ship");
 
         this.element.className = this._type;
+
+        this.hitbox1 = this.createHitboxElements(1);
+        this.hitbox2 = this.createHitboxElements(2);
+        this.hitbox3 = this.createHitboxElements(3);
     }
 
     update(x:number, y:number)
@@ -83,5 +91,21 @@ class Ship
         {
             this.shoot(shootUp);
         }
+    }
+
+    // Create ship hitbox
+    createHitboxElements(nr:number)
+    {
+        let hitbox = document.createElement("div");
+        hitbox.className = "hitbox_" + nr;
+
+        this.element.appendChild(hitbox);
+
+        return hitbox;
+    }
+
+    checkHitboxes()
+    {
+        
     }
 }

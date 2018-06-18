@@ -18,6 +18,7 @@ class Bullet
     _y:number = 0;
 
     _vissible:boolean = true;
+    isEnemyBullet:boolean = false;
 
     constructor(g:Game, up:boolean, left: boolean, ship:Ship)
     {
@@ -26,6 +27,9 @@ class Bullet
 
         this._up = up;
         this._left = left;
+
+        // Is enemy ship?
+        this.isEnemyBullet = ship._type != 'pirate';
 
         this.element = document.createElement("bullet");
 
@@ -107,6 +111,19 @@ class Bullet
             let getMe = this.game.bullets.indexOf(this);
             this.game.bullets.splice(getMe, 1);
         }, 1000);
+    }
+
+    boom()
+    {
+        this._vissible = false;
+        this.element.style.background = "#FF0000";
+
+        setTimeout(() => {
+            this.element.remove();
+            let getMe = this.game.bullets.indexOf(this);
+            this.game.bullets.splice(getMe, 1);
+        }, 1000);
+
     }
 
     checkCollision()
