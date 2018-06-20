@@ -14,7 +14,7 @@ class Player
         this.ship = new Ship(true, g);
 
         // Set z-index
-        this.ship.element.style.zIndex = "7";
+        this.ship.element.style.zIndex = "4";
 
         this.game = g;
     }
@@ -65,9 +65,14 @@ class Player
     {
         this.ship.shoot(false);
     }
-
     update()
     {
         this.ship.update(this._x, this._y);
     }
+
+    gotShot()
+    {
+        this.health -= 3.5;
+    }
+
 }

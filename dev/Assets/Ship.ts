@@ -16,9 +16,9 @@ class Ship
     public x = 0;
     public y = 0;
 
-    public hitbox1;
-    public hitbox2;
-    public hitbox3;
+    public hitbox1:HTMLElement;
+    public hitbox2:HTMLElement;
+    public hitbox3:HTMLElement;
 
     constructor(isPirate:boolean, g:Game)
     {
@@ -77,6 +77,11 @@ class Ship
         if(this.canonsAvailable <= 1.5)
         {
             return;
+        }
+
+        if(this._type === "pirate") 
+        {
+            this.game.score.cannonsShoot++;
         }
 
         this.canonsAvailable--;

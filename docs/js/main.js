@@ -2,6 +2,11 @@
 var Game = (function () {
     function Game() {
         this.bullets = [];
+        this.score = {
+            waves: 0,
+            survived: 0,
+            cannonsShoot: 0
+        };
         this.game = document.createElement("game");
         this.menu();
         this.gameLoop();
@@ -15,6 +20,8 @@ var Game = (function () {
         this.initializeKeybinding();
         this.themeMusic = this.playThemeMusic();
         this.cannonballSound = this.cannonInitializer();
+        this.bellSound = this.bellsInitializer();
+        this.boomSound = this.boomInitializer();
         document.body.appendChild(this.game);
     }
     Game.prototype.gameLoop = function () {
@@ -78,6 +85,23 @@ var Game = (function () {
             autoplay: false,
             loop: false,
             volume: 0.2,
+            pool: 5
+        });
+    };
+    Game.prototype.bellsInitializer = function () {
+        return new Howl({
+            src: ['./sounds/bell.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 1
+        });
+    };
+    Game.prototype.boomInitializer = function () {
+        return new Howl({
+            src: ['./sounds/boom.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 0.4,
             pool: 5
         });
     };
@@ -179,10 +203,9 @@ var Bullet = (function () {
         var _this = this;
         this._vissible = false;
         this.element.style.background = "#FF0000";
+        this.game.boomSound.play();
         setTimeout(function () {
             _this.element.remove();
-            var getMe = _this.game.bullets.indexOf(_this);
-            _this.game.bullets.splice(getMe, 1);
         }, 1000);
     };
     Bullet.prototype.checkCollision = function () {
@@ -246,6 +269,7 @@ var Clouds = (function () {
 var Enemy = (function () {
     function Enemy(g) {
         this.health = 100;
+        this.killed = false;
         this._x = 100;
         this._y = 100;
         this._speed = 0.8;
@@ -257,8 +281,8 @@ var Enemy = (function () {
         this.game = g;
         this.ship = new Ship(false, g);
         this.ship.refillSpeed = 0.03;
-        this._x = (window.innerWidth - 300);
-        this._y = (window.innerHeight - 300);
+        this._x = (window.innerWidth - Math.floor(Math.random() * 300));
+        this._y = (window.innerHeight - Math.floor(Math.random() * 250));
         this.ship.element.style.animationDelay = Math.random() + "s";
         this.ship.element.style.zIndex = "70";
         this.selfThinking();
@@ -332,6 +356,21 @@ var Enemy = (function () {
         this.ship.refill();
         this.ship.update(this._x, this._y);
     };
+    Enemy.prototype.sink = function () {
+        this.ship.element.remove();
+        var getMe = this.game.screen.enemy.indexOf(this);
+        this.game.screen.enemy.splice(getMe, 1);
+        if (!this.killed) {
+            this.killed = true;
+            this.game.score.survived++;
+        }
+    };
+    Enemy.prototype.gotShot = function () {
+        this.health -= 3.5;
+        if (this.health < 0) {
+            this.sink();
+        }
+    };
     return Enemy;
 }());
 var Healthbar = (function () {
@@ -381,7 +420,7 @@ var Player = (function () {
         this._y = 100;
         this._speed = 1;
         this.ship = new Ship(true, g);
-        this.ship.element.style.zIndex = "7";
+        this.ship.element.style.zIndex = "4";
         this.game = g;
     }
     Player.prototype.speed = function (speed) {
@@ -417,6 +456,9 @@ var Player = (function () {
     };
     Player.prototype.update = function () {
         this.ship.update(this._x, this._y);
+    };
+    Player.prototype.gotShot = function () {
+        this.health -= 3.5;
     };
     return Player;
 }());
@@ -461,6 +503,9 @@ var Ship = (function () {
         if (this.canonsAvailable <= 1.5) {
             return;
         }
+        if (this._type === "pirate") {
+            this.game.score.cannonsShoot++;
+        }
         this.canonsAvailable--;
         this.game.bullets.push(new Bullet(this.game, shootUp, this.movingRight, this));
     };
@@ -483,20 +528,35 @@ var GameOverScreen = (function () {
     function GameOverScreen(g) {
         var _this = this;
         this.game = g;
-        this.div = document.createElement("splash");
-        document.body.appendChild(this.div);
-        this.div.innerHTML = "GAME OVER!<br/><br/>5";
-        var timeOut = 5;
+        this.scene = document.createElement("endscreen");
+        this.scene.className = "animated bounceInUp";
+        g.game.appendChild(this.scene);
+        var middle = document.createElement("div");
+        middle.className = "centered";
+        middle.innerHTML = "<b>GAME OVER!</b><small>Waves survived:</small>" + (this.game.score.waves - 1) + "<br /><small>Ships destroyed:</small>" + this.game.score.survived + "<br /><small>Fired cannons:</small>" + this.game.score.cannonsShoot + "<br />";
+        var timeOut = 60;
         var addPoints = setInterval(function () {
             timeOut--;
             if (timeOut === 0) {
                 _this.game.menu();
                 clearInterval(addPoints);
+                setTimeout(function () {
+                    _this.scene.remove();
+                }, 1000);
             }
             else {
-                _this.div.innerHTML = "GAME OVER!<br/><br/>" + timeOut;
             }
         }, 1000);
+        var menuButton = document.createElement("a");
+        menuButton.className = "back-to-menu";
+        menuButton.innerHTML = "Back to menu";
+        menuButton.href = "javascript:void(0)";
+        menuButton.addEventListener("click", function () {
+            clearInterval(addPoints);
+            _this.game.menu();
+        });
+        middle.appendChild(menuButton);
+        this.scene.appendChild(middle);
     }
     GameOverScreen.prototype.update = function () {
     };
@@ -504,14 +564,21 @@ var GameOverScreen = (function () {
 }());
 var PlayScreen = (function () {
     function PlayScreen(g) {
+        this.isRunning = true;
+        this.enemy = [];
+        this.wave = 0;
+        this.creatingNewWave = false;
         this.game = g;
+        this.game.score = {
+            waves: 0,
+            survived: 0,
+            cannonsShoot: 0
+        };
         this.scene = document.createElement("playscreen");
         this.scene.className = "animated fadeInUp";
         g.game.appendChild(this.scene);
         this.player = new Player(g);
         this.scene.appendChild(this.player.getShip());
-        this.enemy = new Enemy(g);
-        this.scene.appendChild(this.enemy.getShip());
         new Clouds(this.scene);
         var island1 = new Island(this.scene, 'first');
         island1.position((window.innerWidth / 2 - 220), -50).big().show();
@@ -521,10 +588,26 @@ var PlayScreen = (function () {
         this.canonsLeft.className = "canons-left";
         this.canonsLeft.innerHTML = "10";
         this.scene.appendChild(this.canonsLeft);
+        this.healthBar = document.createElement("div");
+        this.healthBar.className = "health-bar";
+        this.healthBarIndicator = document.createElement("div");
+        this.healthBarIndicator.className = "health-bar-indicator";
+        this.healthBar.appendChild(this.healthBarIndicator);
+        this.scene.appendChild(this.healthBar);
     }
     PlayScreen.prototype.update = function () {
+        if (!this.isRunning || this.creatingNewWave) {
+            return;
+        }
         this.player.update();
-        this.enemy.update();
+        if (this.enemy.length === 0) {
+            this.creatingNewWave = true;
+            this.newWave();
+            return;
+        }
+        for (var enemy = 0; enemy < this.enemy.length; enemy++) {
+            this.enemy[enemy].update();
+        }
         if (this.game.key.left) {
             this.player.moveLeft();
         }
@@ -540,16 +623,34 @@ var PlayScreen = (function () {
         if (this.game.key.spacebar) {
             this.player.shoot();
         }
+        this.healthBarIndicator.style.width = this.player.health + "%";
+        if (this.player.health < 0) {
+            this.closeScene();
+            return;
+        }
         this.player.ship.refill();
         var available = Math.floor(this.player.ship.canonsAvailable);
         this.canonsLeft.innerHTML = (available < 10 ? "0" + String(available) : available) + " kanonnen over";
         for (var bullets = 0; bullets < this.game.bullets.length; bullets++) {
             this.game.bullets[bullets].update();
-            if (this.game.bullets[bullets].isEnemyBullet) {
-                if (this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox1.getBoundingClientRect()) ||
-                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox2.getBoundingClientRect()) ||
-                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox3.getBoundingClientRect())) {
-                    this.game.bullets[bullets].boom();
+            if (this.game.bullets[bullets]._vissible) {
+                if (this.game.bullets[bullets].isEnemyBullet) {
+                    if (this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox1.getBoundingClientRect()) ||
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox2.getBoundingClientRect()) ||
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox3.getBoundingClientRect())) {
+                        this.player.gotShot();
+                        this.game.bullets[bullets].boom();
+                    }
+                }
+                else {
+                    for (var enemy = 0; enemy < this.enemy.length; enemy++) {
+                        if (this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox1.getBoundingClientRect()) ||
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox2.getBoundingClientRect()) ||
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox3.getBoundingClientRect())) {
+                            this.enemy[enemy].gotShot();
+                            this.game.bullets[bullets].boom();
+                        }
+                    }
                 }
             }
         }
@@ -559,6 +660,41 @@ var PlayScreen = (function () {
             b.left <= a.right &&
             a.top <= b.bottom &&
             b.top <= a.bottom);
+    };
+    PlayScreen.prototype.closeScene = function () {
+        var _this = this;
+        this.isRunning = false;
+        new Woosh('scene');
+        this.scene.className = "animated fadeOutUp";
+        this.game.gameOver();
+        setTimeout(function () {
+            _this.scene.remove();
+        }, 750);
+    };
+    PlayScreen.prototype.newWave = function () {
+        var _this = this;
+        this.wave++;
+        this.game.score.waves++;
+        this.game.bellSound.play();
+        var waveText = document.createElement("div");
+        waveText.className = "wave-number animated fadeInDown";
+        waveText.innerHTML = "WAVE <b>" + this.wave + "</b>";
+        document.body.appendChild(waveText);
+        setTimeout(function () {
+            waveText.className = "wave-number animated fadeOutDown";
+            setTimeout(function () {
+                waveText.remove();
+            }, 2500);
+        }, 2500);
+        var amountOfShips = Math.floor(this.wave / 1.3);
+        for (var i = 0; i < (amountOfShips == 0 ? 1 : amountOfShips); i++) {
+            var enemyShip = new Enemy(this.game);
+            this.scene.appendChild(enemyShip.getShip());
+            this.enemy.push(enemyShip);
+        }
+        setTimeout(function () {
+            _this.creatingNewWave = false;
+        }, 100);
     };
     return PlayScreen;
 }());

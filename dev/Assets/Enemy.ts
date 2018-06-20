@@ -1,6 +1,7 @@
 class Enemy
 {
     health = 100;
+    killed:boolean = false;
     ship:Ship;
 
     _x:number = 100;
@@ -26,8 +27,8 @@ class Enemy
         this.ship.refillSpeed = 0.03;
 
         // Set start position
-        this._x = (window.innerWidth - 300);
-        this._y = (window.innerHeight - 300);
+        this._x = (window.innerWidth - Math.floor(Math.random() * 300));
+        this._y = (window.innerHeight - Math.floor(Math.random() * 250));
 
         // Set animation dilay
         this.ship.element.style.animationDelay = Math.random() + "s";
@@ -153,5 +154,30 @@ class Enemy
 
         // Update position
         this.ship.update(this._x, this._y);
+    }
+
+    sink()
+    {
+        this.ship.element.remove();
+
+        let getMe = this.game.screen.enemy.indexOf(this);
+        this.game.screen.enemy.splice(getMe, 1);
+
+        if(!this.killed) {
+            this.killed = true;
+            
+            // Survived
+            this.game.score.survived++;
+        }
+    }
+
+    gotShot()
+    {
+        this.health -= 3.5;
+
+        if(this.health < 0)
+        {
+            this.sink();
+        }
     }
 }

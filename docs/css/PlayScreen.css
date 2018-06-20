@@ -20,6 +20,32 @@ playscreen
     text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
+
+.wave-number {
+    font-size: 40px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    width: 200px;
+    height: 300px;
+    margin-left: -100px;
+    margin-top: -150px;
+    text-align: center;
+
+    z-index: 9999;
+    color: #FFFFFF;
+    
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.3);
+}
+
+.wave-number b {
+    font-size: 150px;
+    display: block;
+    text-align: center;
+    width: 200px;
+}
+
 /**/
 
 ship
@@ -52,7 +78,6 @@ ship .hitbox_1
 {
     width: 72px;
     height: 19px;
-    background: #FFFFFF;
     position: absolute;
     left: 39px;
     top: 145px;
@@ -62,7 +87,6 @@ ship .hitbox_2
 {
     width: 100px;
     height: 20px;
-    background: #FFFFFF;
     position: absolute;
     left: 60px;
     top: 125px;
@@ -72,7 +96,6 @@ ship .hitbox_3
 {
     width: 80px;
     height: 20px;
-    background: #FFFFFF;
     position: absolute;
     left: 110px;
     top: 105px;
@@ -80,7 +103,9 @@ ship .hitbox_3
 
 ship.turned .hitbox_1
 {
-    top: 116px;
+    top: 110px;
+    left: 10px;
+    height: 25px;
 }
 
 ship.turned .hitbox_2
@@ -117,6 +142,28 @@ bullet.splash
     margin-top: -25px;
     display: block;
     animation: splash 1s;
+
+    z-index: 999;
+}
+
+.health-bar
+{
+    background: #d23535;
+
+    bottom: 40px;
+    height: 50px;
+    width: 400px;
+    left: 50%;
+    margin-left: -200px;
+    box-shadow: 0px 3px 20px rgba(255, 255, 255, 0.28);
+}
+
+.health-bar-indicator
+{
+    background-color: #3cc53c;
+    height: 50px;
+    width: 35%;
+    display: block
 }
 
 @keyframes ship

@@ -117,11 +117,10 @@ class Bullet
     {
         this._vissible = false;
         this.element.style.background = "#FF0000";
+        this.game.boomSound.play();
 
         setTimeout(() => {
             this.element.remove();
-            let getMe = this.game.bullets.indexOf(this);
-            this.game.bullets.splice(getMe, 1);
         }, 1000);
 
     }

@@ -12,6 +12,14 @@ class Game {
     bullets:Bullet[] = [];
 
     cannonballSound:any;
+    bellSound:any;
+    boomSound:any;
+
+    score:any = {
+        waves: 0,
+        survived: 0,
+        cannonsShoot: 0
+    };
 
     constructor() {
         this.game = document.createElement("game");
@@ -33,6 +41,8 @@ class Game {
 
         this.themeMusic = this.playThemeMusic();
         this.cannonballSound = this.cannonInitializer();
+        this.bellSound = this.bellsInitializer();
+        this.boomSound = this.boomInitializer();
         
         // document.body.appendChild(this.themeMusic);
         document.body.appendChild(this.game);
@@ -127,6 +137,27 @@ class Game {
             autoplay: false,
             loop: false,
             volume: 0.2,
+            pool: 5
+        });
+    }
+
+    private bellsInitializer()
+    {
+        return new Howl({
+            src: ['./sounds/bell.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 1
+        });
+    }
+
+    private boomInitializer()
+    {
+        return new Howl({
+            src: ['./sounds/boom.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 0.4,
             pool: 5
         });
     }

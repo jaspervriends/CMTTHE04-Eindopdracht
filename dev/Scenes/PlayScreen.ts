@@ -1,17 +1,30 @@
 class PlayScreen {
 
+    isRunning:Boolean = true;
     game:Game;
     private scene: HTMLElement;
 
     player:Player;
 
-    enemy:Enemy;
+    enemy:Enemy[] = [];
 
     // Stats
     canonsLeft:HTMLElement;
+    healthBar:HTMLElement;
+    healthBarIndicator:HTMLElement;
+
+    wave:number = 0;
+    creatingNewWave:boolean = false;
 
     constructor(g:Game) {
         this.game = g;
+
+        // Reset game score
+        this.game.score = {
+            waves: 0,
+            survived: 0,
+            cannonsShoot: 0
+        };
 
         // Scene element
         this.scene = document.createElement("playscreen");
@@ -23,10 +36,6 @@ class PlayScreen {
         this.player = new Player(g);
 
         this.scene.appendChild(this.player.getShip());
-
-        this.enemy = new Enemy(g);
-
-        this.scene.appendChild(this.enemy.getShip());
 
         // New cloud
         new Clouds(this.scene);
@@ -43,15 +52,35 @@ class PlayScreen {
         this.canonsLeft.innerHTML = "10";
 
         this.scene.appendChild(this.canonsLeft);
+        
+        // Healthbar
+        this.healthBar = document.createElement("div");
+        this.healthBar.className = "health-bar";
+
+        this.healthBarIndicator = document.createElement("div");
+        this.healthBarIndicator.className = "health-bar-indicator";
+        
+        this.healthBar.appendChild(this.healthBarIndicator);
+        this.scene.appendChild(this.healthBar);
     }
 
     // Check keys and update bullets
     public update(): void {
+        if(!this.isRunning || this.creatingNewWave) { return; }
 
         // Player update
         this.player.update();
 
-        this.enemy.update();
+        if(this.enemy.length === 0)
+        {
+            this.creatingNewWave = true;
+            this.newWave();
+            return;
+        }
+
+        for(let enemy = 0; enemy < this.enemy.length; enemy++) {
+            this.enemy[enemy].update();
+        }
 
         // Key actions
         if(this.game.key.left)
@@ -77,6 +106,15 @@ class PlayScreen {
             this.player.shoot();
         }
 
+        
+        this.healthBarIndicator.style.width = this.player.health + "%";
+
+        if(this.player.health < 0)
+        {
+            this.closeScene();
+            return;
+        }
+
         // Refill the ship
         this.player.ship.refill();
 
@@ -86,21 +124,34 @@ class PlayScreen {
         for(let bullets = 0; bullets < this.game.bullets.length; bullets++)
         {
             this.game.bullets[bullets].update();
-            
-            if(this.game.bullets[bullets].isEnemyBullet) 
-            {
-                if(
-                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox1.getBoundingClientRect()) ||
-                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox2.getBoundingClientRect()) ||
-                    this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox3.getBoundingClientRect())
-                )
+
+            if(this.game.bullets[bullets]._vissible) {
+                if(this.game.bullets[bullets].isEnemyBullet) 
                 {
-                    this.game.bullets[bullets].boom();
+                    if(
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox1.getBoundingClientRect()) ||
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox2.getBoundingClientRect()) ||
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox3.getBoundingClientRect())
+                    )
+                    {
+                        this.player.gotShot();
+                        this.game.bullets[bullets].boom();
+                    }
+                }else{
+                    for(let enemy = 0; enemy < this.enemy.length; enemy++) {
+                        if(
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox1.getBoundingClientRect()) ||
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox2.getBoundingClientRect()) ||
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox3.getBoundingClientRect())
+                        )
+                        {
+                            this.enemy[enemy].gotShot();
+                            this.game.bullets[bullets].boom();
+                        }
+                    }
                 }
             }
         }
-
-        // console.log("Avaiable canons: " + this.player.ship.canonsAvailable);
     }
 
     private checkCollision(a: ClientRect, b: ClientRect) {
@@ -109,14 +160,54 @@ class PlayScreen {
             a.top <= b.bottom &&
             b.top <= a.bottom)
     }
+    
+    public closeScene()
+    {
+        this.isRunning = false;
+        new Woosh('scene');
+        this.scene.className = "animated fadeOutUp";
 
-    // public removeHealth()
-    // {
-    //     this.health--;
+        this.game.gameOver();
 
-    //     if(this.health === 0)
-    //     {
-    //         this.game.gameOver();
-    //     }
-    // }
+        setTimeout(() => {
+            this.scene.remove();
+        }, 750);
+    }
+
+    public newWave()
+    {
+        this.wave++;
+        this.game.score.waves++;
+        this.game.bellSound.play();
+
+        // Show new wave
+        let waveText = document.createElement("div");
+        waveText.className = "wave-number animated fadeInDown";
+        waveText.innerHTML = "WAVE <b>" + this.wave + "</b>";
+        document.body.appendChild(waveText);
+
+        setTimeout(() => {
+            waveText.className = "wave-number animated fadeOutDown";
+            
+            
+            setTimeout(() => {
+                waveText.remove();
+            }, 2500);
+        }, 2500);
+
+        let amountOfShips = Math.floor(this.wave / 1.3)
+
+        for(let i = 0; i < (amountOfShips == 0 ? 1 : amountOfShips); i++) {
+            let enemyShip = new Enemy(this.game);
+
+            this.scene.appendChild(enemyShip.getShip());
+
+            this.enemy.push(enemyShip);
+        }
+
+        setTimeout(() => {
+            this.creatingNewWave = false;
+        }, 100);
+        
+    }
 }
