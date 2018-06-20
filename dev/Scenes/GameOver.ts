@@ -49,6 +49,15 @@ class GameOverScreen {
 
         // Add to scene
         this.scene.appendChild(middle);
+
+
+        // Sound
+        this.game.themeMusic.fade(1, 0, 500);
+        this.game.endsceneSound.play();
+
+        setTimeout(() => {
+            this.game.themeMusic.fade(0, 1, 500);
+        }, 5000);
     }
 
     update() {

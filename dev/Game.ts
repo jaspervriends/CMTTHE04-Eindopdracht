@@ -14,6 +14,7 @@ class Game {
     cannonballSound:any;
     bellSound:any;
     boomSound:any;
+    endsceneSound:any;
 
     score:any = {
         waves: 0,
@@ -43,6 +44,7 @@ class Game {
         this.cannonballSound = this.cannonInitializer();
         this.bellSound = this.bellsInitializer();
         this.boomSound = this.boomInitializer();
+        this.endsceneSound = this.endSceneInitializer();
         
         // document.body.appendChild(this.themeMusic);
         document.body.appendChild(this.game);
@@ -155,6 +157,17 @@ class Game {
     {
         return new Howl({
             src: ['./sounds/boom.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 0.4,
+            pool: 5
+        });
+    }
+
+    private endSceneInitializer()
+    {
+        return new Howl({
+            src: ['./sounds/endscene.mp3'],
             autoplay: false,
             loop: false,
             volume: 0.4,

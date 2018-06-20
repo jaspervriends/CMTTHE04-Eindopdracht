@@ -22,6 +22,7 @@ var Game = (function () {
         this.cannonballSound = this.cannonInitializer();
         this.bellSound = this.bellsInitializer();
         this.boomSound = this.boomInitializer();
+        this.endsceneSound = this.endSceneInitializer();
         document.body.appendChild(this.game);
     }
     Game.prototype.gameLoop = function () {
@@ -99,6 +100,15 @@ var Game = (function () {
     Game.prototype.boomInitializer = function () {
         return new Howl({
             src: ['./sounds/boom.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 0.4,
+            pool: 5
+        });
+    };
+    Game.prototype.endSceneInitializer = function () {
+        return new Howl({
+            src: ['./sounds/endscene.mp3'],
             autoplay: false,
             loop: false,
             volume: 0.4,
@@ -557,6 +567,11 @@ var GameOverScreen = (function () {
         });
         middle.appendChild(menuButton);
         this.scene.appendChild(middle);
+        this.game.themeMusic.fade(1, 0, 500);
+        this.game.endsceneSound.play();
+        setTimeout(function () {
+            _this.game.themeMusic.fade(0, 1, 500);
+        }, 5000);
     }
     GameOverScreen.prototype.update = function () {
     };
