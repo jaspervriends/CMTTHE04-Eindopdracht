@@ -136,6 +136,7 @@ class Game {
     {
         return new Howl({
             src: ['./sounds/cannonball.mp3'],
+            preload: true,
             autoplay: false,
             loop: false,
             volume: 0.2,
@@ -147,6 +148,7 @@ class Game {
     {
         return new Howl({
             src: ['./sounds/bell.mp3'],
+            preload: true,
             autoplay: false,
             loop: false,
             volume: 1
@@ -157,6 +159,7 @@ class Game {
     {
         return new Howl({
             src: ['./sounds/boom.mp3'],
+            preload: true,
             autoplay: false,
             loop: false,
             volume: 0.4,
@@ -168,6 +171,7 @@ class Game {
     {
         return new Howl({
             src: ['./sounds/endscene.mp3'],
+            preload: true,
             autoplay: false,
             loop: false,
             volume: 0.4,

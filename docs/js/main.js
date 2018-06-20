@@ -83,6 +83,7 @@ var Game = (function () {
     Game.prototype.cannonInitializer = function () {
         return new Howl({
             src: ['./sounds/cannonball.mp3'],
+            preload: true,
             autoplay: false,
             loop: false,
             volume: 0.2,
@@ -92,6 +93,7 @@ var Game = (function () {
     Game.prototype.bellsInitializer = function () {
         return new Howl({
             src: ['./sounds/bell.mp3'],
+            preload: true,
             autoplay: false,
             loop: false,
             volume: 1
@@ -100,6 +102,7 @@ var Game = (function () {
     Game.prototype.boomInitializer = function () {
         return new Howl({
             src: ['./sounds/boom.mp3'],
+            preload: true,
             autoplay: false,
             loop: false,
             volume: 0.4,
@@ -109,6 +112,7 @@ var Game = (function () {
     Game.prototype.endSceneInitializer = function () {
         return new Howl({
             src: ['./sounds/endscene.mp3'],
+            preload: true,
             autoplay: false,
             loop: false,
             volume: 0.4,
