@@ -57,7 +57,7 @@ class GameOverScreen {
 
         setTimeout(() => {
             this.game.themeMusic.fade(0, 1, 500);
-        }, 5000);
+        }, 4000);
     }
 
     update() {

@@ -2,11 +2,13 @@
 var Game = (function () {
     function Game() {
         this.bullets = [];
+        this.fireSounds = [];
         this.score = {
             waves: 0,
             survived: 0,
             cannonsShoot: 0
         };
+        this.firePlaying = false;
         this.game = document.createElement("game");
         this.menu();
         this.gameLoop();
@@ -23,6 +25,7 @@ var Game = (function () {
         this.bellSound = this.bellsInitializer();
         this.boomSound = this.boomInitializer();
         this.endsceneSound = this.endSceneInitializer();
+        this.initializerFires();
         document.body.appendChild(this.game);
     }
     Game.prototype.gameLoop = function () {
@@ -118,6 +121,43 @@ var Game = (function () {
             volume: 0.4,
             pool: 5
         });
+    };
+    Game.prototype.initializerFires = function () {
+        var _this = this;
+        this.fireSounds.push(new Howl({
+            src: ['./sounds/fire_1.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 1,
+            onend: function () {
+                _this.firePlaying = false;
+            }
+        }));
+        this.fireSounds.push(new Howl({
+            src: ['./sounds/fire_2.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 1,
+            onend: function () {
+                _this.firePlaying = false;
+            }
+        }));
+        this.fireSounds.push(new Howl({
+            src: ['./sounds/fire_3.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 1,
+            onend: function () {
+                _this.firePlaying = false;
+            }
+        }));
+    };
+    Game.prototype.shoutFire = function () {
+        if (this.firePlaying) {
+            return;
+        }
+        this.firePlaying = true;
+        this.fireSounds[Math.floor(Math.random() * this.fireSounds.length)].play();
     };
     Game.prototype.clear = function () {
     };
@@ -466,6 +506,9 @@ var Player = (function () {
         this._y = this._y + this._speed;
     };
     Player.prototype.shoot = function () {
+        if (this.ship.canonsAvailable >= 5) {
+            this.game.shoutFire();
+        }
         this.ship.shoot(false);
     };
     Player.prototype.update = function () {
@@ -575,7 +618,7 @@ var GameOverScreen = (function () {
         this.game.endsceneSound.play();
         setTimeout(function () {
             _this.game.themeMusic.fade(0, 1, 500);
-        }, 5000);
+        }, 4000);
     }
     GameOverScreen.prototype.update = function () {
     };

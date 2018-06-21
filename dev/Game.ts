@@ -16,11 +16,15 @@ class Game {
     boomSound:any;
     endsceneSound:any;
 
+    fireSounds:any = [];
+
     score:any = {
         waves: 0,
         survived: 0,
         cannonsShoot: 0
-    };
+    }
+
+    firePlaying:boolean = false;
 
     constructor() {
         this.game = document.createElement("game");
@@ -45,6 +49,7 @@ class Game {
         this.bellSound = this.bellsInitializer();
         this.boomSound = this.boomInitializer();
         this.endsceneSound = this.endSceneInitializer();
+        this.initializerFires();
         
         // document.body.appendChild(this.themeMusic);
         document.body.appendChild(this.game);
@@ -177,6 +182,46 @@ class Game {
             volume: 0.4,
             pool: 5
         });
+    }
+
+    private initializerFires()
+    {
+        this.fireSounds.push(new Howl({
+            src: ['./sounds/fire_1.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 1,
+            onend: () => {
+                this.firePlaying = false;
+            }
+        }));
+
+        this.fireSounds.push(new Howl({
+            src: ['./sounds/fire_2.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 1,
+            onend: () => {
+                this.firePlaying = false;
+            }
+        }));
+
+        this.fireSounds.push(new Howl({
+            src: ['./sounds/fire_3.mp3'],
+            autoplay: false,
+            loop: false,
+            volume: 1,
+            onend: () => {
+                this.firePlaying = false;
+            }
+        }));
+    }
+
+    public shoutFire()
+    {
+        if(this.firePlaying){ return; }
+        this.firePlaying = true;
+        this.fireSounds[Math.floor(Math.random() * this.fireSounds.length)].play();
     }
 
     private clear()

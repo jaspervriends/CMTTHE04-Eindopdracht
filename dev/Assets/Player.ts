@@ -63,6 +63,11 @@ class Player
 
     shoot()
     {
+        if(this.ship.canonsAvailable >= 5)
+        {
+            this.game.shoutFire();
+        }
+
         this.ship.shoot(false);
     }
     update()
