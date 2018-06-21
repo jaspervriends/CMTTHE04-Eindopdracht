@@ -341,6 +341,10 @@ class Enemy extends Ship
     }
 ```
 
+## Klassendiagram
+![klassen-diagram](https://raw.githubusercontent.com/jaspervriends/CMTTHE04-Eindopdracht/master/docs/images/diagram.png)
+
+
 # Peer reviews
 ### PeerReview van Brank https://github.com/branksz/game
 
