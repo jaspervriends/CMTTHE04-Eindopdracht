@@ -2,29 +2,29 @@
 
 class Game {
     
-    screen:any;
-    themeMusic:HTMLAudioElement;
-    game:HTMLElement;
+    public screen:any;
+    public themeMusic:HTMLAudioElement;
+    public game:HTMLElement;
 
-    key:any;
+    public key:any;
 
     // Game bullets
-    bullets:Bullet[] = [];
+    public bullets:Bullet[] = [];
 
-    cannonballSound:any;
-    bellSound:any;
-    boomSound:any;
-    endsceneSound:any;
+    public cannonballSound:any;
+    public bellSound:any;
+    public boomSound:any;
+    public endsceneSound:any;
 
-    fireSounds:any = [];
+    public fireSounds:any = [];
 
-    score:any = {
+    public score:any = {
         waves: 0,
         survived: 0,
         cannonsShoot: 0
     }
 
-    firePlaying:boolean = false;
+    private firePlaying:boolean = false;
 
     constructor() {
         this.game = document.createElement("game");

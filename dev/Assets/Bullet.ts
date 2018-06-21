@@ -1,21 +1,21 @@
 class Bullet
 {
 
-    game:Game;
-    element:HTMLElement;
-    ship:Ship;
+    private game:Game;
+    public element:HTMLElement;
+    public ship:Ship;
 
     // Bullet speed
-    _speed:number = 1.2;
-    _range:number = 200;
-    _startPoint:number = 0;
+    private _speed:number = 1.2;
+    private _range:number = 200;
+    private _startPoint:number = 0;
 
 
-    _up:boolean = false;
-    _left:boolean = true;
+    private _up:boolean = false;
+    private _left:boolean = true;
 
-    _x:number = 0;
-    _y:number = 0;
+    private _x:number = 0;
+    private _y:number = 0;
 
     _vissible:boolean = true;
     isEnemyBullet:boolean = false;

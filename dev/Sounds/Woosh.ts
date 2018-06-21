@@ -1,6 +1,6 @@
 class Woosh
 {
-    object:HTMLAudioElement;
+    private object:HTMLAudioElement;
 
     constructor(type:String)
     {

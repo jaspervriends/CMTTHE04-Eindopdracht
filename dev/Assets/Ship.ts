@@ -1,17 +1,17 @@
 class Ship
 {
-    _type:string;
+    public _type:string;
 
-    game:Game;
+    private game:Game;
 
-    element:HTMLElement;
+    public element:HTMLElement;
 
-    movingUp:boolean = false;
-    movingRight:boolean = true;
+    public movingUp:boolean = false;
+    public movingRight:boolean = true;
 
-    canonsAvailable:number = 10;
-    canons:number = 10;
-    refillSpeed:number = 0.05;
+    public canonsAvailable:number = 10;
+    public canons:number = 10;
+    public refillSpeed:number = 0.05;
 
     public x = 0;
     public y = 0;

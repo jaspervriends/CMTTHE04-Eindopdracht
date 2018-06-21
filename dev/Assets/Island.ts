@@ -1,8 +1,8 @@
 
 class Island
 {
-    object:HTMLElement;
-    scene:any;
+    public object:HTMLElement;
+    private scene:any;
 
     constructor(scene:any, className:String)
     {

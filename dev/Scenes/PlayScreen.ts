@@ -1,20 +1,20 @@
 class PlayScreen {
 
-    isRunning:Boolean = true;
-    game:Game;
+    private isRunning:Boolean = true;
+    private game:Game;
     private scene: HTMLElement;
 
-    player:Player;
+    public player:Player;
 
-    enemy:Enemy[] = [];
+    public enemy:Enemy[] = [];
 
     // Stats
-    canonsLeft:HTMLElement;
-    healthBar:HTMLElement;
-    healthBarIndicator:HTMLElement;
+    private canonsLeft:HTMLElement;
+    private healthBar:HTMLElement;
+    private healthBarIndicator:HTMLElement;
 
-    wave:number = 0;
-    creatingNewWave:boolean = false;
+    private wave:number = 0;
+    private creatingNewWave:boolean = false;
 
     constructor(g:Game) {
         this.game = g;
