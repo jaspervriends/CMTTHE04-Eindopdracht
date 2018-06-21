@@ -44,5 +44,8 @@ Polygon images from https://www.behance.net/gallery/16462531/Low-poly-pirates
 - [ ] De game gebruikt een externe library uit de lijst in deze modulewijzer. 
 
 ## Feedback
-Het spel van Branko is leuk, moeilijk en verslavend, hij houd netjes alle higscores bij en het spel ziet er simpel maar verzorgd uit. Alle criteria en uitwerkingen staan vermeld in de README en bevat een klassendiagram.
+Het spel van Branko is leuk, moeilijk en verslavend, hij houd netjes alle higscores bij en het spel ziet er simpel maar verzorgd uit. Alle criteria en uitwerkingen staan vermeld in de README. Deze bevat ook een klassendiagram. Het spel heeft zover ik heb gemerkt geen bugs gevonden en als ik in de code kijk zie ik dat alles er helder uit ziet.
 
+Als ik dit zo zie voldoet het spel aan alle eisen.
+
+Mij is het trouwens gelukt om de 9.734 punten te scoren bij zijn spel (na een aantal pogingen).
