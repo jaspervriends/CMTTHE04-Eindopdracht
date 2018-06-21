@@ -215,13 +215,14 @@ var Bullet = (function () {
             this.element.style.zIndex = "8";
         }
         var randomPosition = Math.random();
+        var position = ship.getPosition();
         if (this._left) {
-            this._x = ship._x + 40 + (randomPosition * 80);
-            this._y = ship._y + 120 + (randomPosition * 40);
+            this._x = position.x + 40 + (randomPosition * 80);
+            this._y = position.y + 120 + (randomPosition * 40);
         }
         else {
-            this._x = ship._x + 142 - (randomPosition * 80);
-            this._y = ship._y + 120 + (randomPosition * 40);
+            this._x = position.x + 142 - (randomPosition * 80);
+            this._y = position.y + 120 + (randomPosition * 40);
         }
         this._range = 170 + (Math.random() * 40);
         this._startPoint = this._x;
@@ -346,6 +347,12 @@ var Ship = (function () {
         this._hitbox2 = this.createHitboxElements(2);
         this._hitbox3 = this.createHitboxElements(3);
     }
+    Ship.prototype.getPosition = function () {
+        return {
+            x: this._x,
+            y: this._y
+        };
+    };
     Ship.prototype._update = function (x, y) {
         this._x = x;
         this._y = y;

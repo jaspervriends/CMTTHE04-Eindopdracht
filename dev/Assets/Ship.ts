@@ -13,8 +13,8 @@ class Ship
     public _canons:number = 10;
     public _refillSpeed:number = 0.05;
 
-    public _x = 0;
-    public _y = 0;
+    protected _x = 0;
+    protected _y = 0;
 
     public _hitbox1:HTMLElement;
     public _hitbox2:HTMLElement;
@@ -33,6 +33,14 @@ class Ship
         this._hitbox1 = this.createHitboxElements(1);
         this._hitbox2 = this.createHitboxElements(2);
         this._hitbox3 = this.createHitboxElements(3);
+    }
+
+    getPosition() : any
+    {
+        return {
+            x: this._x,
+            y: this._y
+        };
     }
 
     _update(x:number, y:number)
