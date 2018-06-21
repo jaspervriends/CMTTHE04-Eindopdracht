@@ -43,11 +43,11 @@ class Bullet
         let randomPosition = Math.random();
 
         if(this._left) {
-            this._x = ship.x + 40 + (randomPosition * 80);
-            this._y = ship.y + 120 + (randomPosition * 40);
+            this._x = ship._x + 40 + (randomPosition * 80);
+            this._y = ship._y + 120 + (randomPosition * 40);
         }else{
-            this._x = ship.x + 142 - (randomPosition * 80);
-            this._y = ship.y + 120 + (randomPosition * 40);
+            this._x = ship._x + 142 - (randomPosition * 80);
+            this._y = ship._y + 120 + (randomPosition * 40);
         }
 
         this._range = 170 + (Math.random() * 40);

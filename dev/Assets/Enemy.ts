@@ -1,14 +1,15 @@
-class Enemy
+///<reference path="Ship.ts" />
+
+class Enemy extends Ship
 {
     health = 100;
     killed:boolean = false;
-    ship:Ship;
 
     _x:number = 100;
     _y:number = 100;
     _speed:number = 0.8;
 
-    game:Game;
+    protected game:Game;
 
     goingUp:boolean = false;
     goingDown:boolean = false;
@@ -18,23 +19,22 @@ class Enemy
 
     constructor(g:Game)
     {
+        super(false);
+
         this.game = g;
         
-        // Create ship
-        this.ship = new Ship(false, g);
-
         // Set refill speed
-        this.ship.refillSpeed = 0.03;
+        this._refillSpeed = 0.03;
 
         // Set start position
         this._x = (window.innerWidth - Math.floor(Math.random() * 300));
         this._y = (window.innerHeight - Math.floor(Math.random() * 250));
 
         // Set animation dilay
-        this.ship.element.style.animationDelay = Math.random() + "s";
+        this._shipElement.style.animationDelay = Math.random() + "s";
 
         // Set z-index
-        this.ship.element.style.zIndex = "70";
+        this._shipElement.style.zIndex = "70";
 
         // Start selfthiking
         this.selfThinking();
@@ -49,7 +49,7 @@ class Enemy
     // Get ship
     getShip()
     {
-        return this.ship.element;
+        return this._shipElement;
     }
 
     // Selfthinking
@@ -119,46 +119,46 @@ class Enemy
         if(this.goingLeft)
         {
             this._x = this._x - this._speed;
-            this.ship.moveLeft();
+            this._moveLeft();
         }
 
         // Enemy goes right
         if(this.goingRight)
         {
             this._x = this._x + this._speed;
-            this.ship.moveRight();
+            this._moveRight();
         }
 
         // Enemy goes up
         if(this.goingUp)
         {
-            this.ship.movingUp = true;
+            this._movingUp = true;
             this._y = this._y - this._speed;
         }
 
         // Enemy goes down
         if(this.goingDown)
         {
-            this.ship.movingUp = false;
+            this._movingUp = false;
             this._y = this._y + this._speed;
         }
 
         // Shoot
-        if(this.shoot && this.ship.canonsAvailable > 7)
+        if(this.shoot && this._canonsAvailable > 7)
         {
-            this.ship.shootAmount(true, 7);
+            this.shootAmount(true, 7);
         }
 
         // Refill
-        this.ship.refill();
+        this.refill();
 
         // Update position
-        this.ship.update(this._x, this._y);
+        this._update(this._x, this._y);
     }
 
     sink()
     {
-        this.ship.element.remove();
+        this._shipElement.remove();
 
         let getMe = this.game.screen.enemy.indexOf(this);
         this.game.screen.enemy.splice(getMe, 1);

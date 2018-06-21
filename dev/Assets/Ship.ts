@@ -2,79 +2,76 @@ class Ship
 {
     public _type:string;
 
-    private game:Game;
+    protected game:Game;
 
-    public element:HTMLElement;
+    public _shipElement:HTMLElement;
 
-    public movingUp:boolean = false;
-    public movingRight:boolean = true;
+    public _movingUp:boolean = false;
+    public _movingRight:boolean = true;
 
-    public canonsAvailable:number = 10;
-    public canons:number = 10;
-    public refillSpeed:number = 0.05;
+    public _canonsAvailable:number = 10;
+    public _canons:number = 10;
+    public _refillSpeed:number = 0.05;
 
-    public x = 0;
-    public y = 0;
+    public _x = 0;
+    public _y = 0;
 
-    public hitbox1:HTMLElement;
-    public hitbox2:HTMLElement;
-    public hitbox3:HTMLElement;
+    public _hitbox1:HTMLElement;
+    public _hitbox2:HTMLElement;
+    public _hitbox3:HTMLElement;
 
-    constructor(isPirate:boolean, g:Game)
+    constructor(isPirate:boolean)
     {
-        // Pass game object
-        this.game = g;
-
         // Set boat type
         this._type = (isPirate ? 'pirate' : 'default');
 
         // Create element
-        this.element = document.createElement("ship");
+        this._shipElement = document.createElement("ship");
 
-        this.element.className = this._type;
+        this._shipElement.className = this._type;
 
-        this.hitbox1 = this.createHitboxElements(1);
-        this.hitbox2 = this.createHitboxElements(2);
-        this.hitbox3 = this.createHitboxElements(3);
+        this._hitbox1 = this.createHitboxElements(1);
+        this._hitbox2 = this.createHitboxElements(2);
+        this._hitbox3 = this.createHitboxElements(3);
     }
 
-    update(x:number, y:number)
+    _update(x:number, y:number)
     {
-        this.x = x;
-        this.y = y;
+        this._x = x;
+        this._y = y;
 
-        this.element.style.left = x + "px";
-        this.element.style.top = y + "px";
+        this._shipElement.style.left = x + "px";
+        this._shipElement.style.top = y + "px";
     }
 
-    moveLeft()
+    _moveLeft()
     {
-        this.movingRight = false;
-        this.element.className = this._type;
+        this._movingRight = false;
+        this._shipElement.className = this._type;
     }
 
-    moveRight()
+    _moveRight()
     {
-        this.movingRight = true;
-        this.element.className = this._type + " turned";
+        this._movingRight = true;
+        this._shipElement.className = this._type + " turned";
     }
 
     // Refill canons
     refill()
     {
-        if(this.canonsAvailable >= this.canons)
+        if(this._canonsAvailable >= this._canons)
         {
             // Enough!
             return;
         }
 
-        this.canonsAvailable += this.refillSpeed;
+        this._canonsAvailable += this._refillSpeed;
     }
 
     // Shoot some canons
-    shoot(shootUp:boolean)
+    _shoot(shootUp:boolean)
     {
-        if(this.canonsAvailable <= 1.5)
+        if(this._canonsAvailable <= 1.5)
         {
             return;
         }
@@ -84,9 +81,9 @@ class Ship
             this.game.score.cannonsShoot++;
         }
 
-        this.canonsAvailable--;
+        this._canonsAvailable--;
         
-        this.game.bullets.push(new Bullet(this.game, shootUp, this.movingRight, this));
+        this.game.bullets.push(new Bullet(this.game, shootUp, this._movingRight, this));
     }
 
     // Shoot directly cannons
@@ -94,7 +91,7 @@ class Ship
     {
         for(let i = 0; i < amount; i++)
         {
-            this.shoot(shootUp);
+            this._shoot(shootUp);
         }
     }
 
@@ -104,7 +101,7 @@ class Ship
         let hitbox = document.createElement("div");
         hitbox.className = "hitbox_" + nr;
 
-        this.element.appendChild(hitbox);
+        this._shipElement.appendChild(hitbox);
 
         return hitbox;
     }

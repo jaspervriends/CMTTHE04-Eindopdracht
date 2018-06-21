@@ -1,4 +1,14 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var Game = (function () {
     function Game() {
         this.bullets = [];
@@ -206,12 +216,12 @@ var Bullet = (function () {
         }
         var randomPosition = Math.random();
         if (this._left) {
-            this._x = ship.x + 40 + (randomPosition * 80);
-            this._y = ship.y + 120 + (randomPosition * 40);
+            this._x = ship._x + 40 + (randomPosition * 80);
+            this._y = ship._y + 120 + (randomPosition * 40);
         }
         else {
-            this._x = ship.x + 142 - (randomPosition * 80);
-            this._y = ship.y + 120 + (randomPosition * 40);
+            this._x = ship._x + 142 - (randomPosition * 80);
+            this._y = ship._y + 120 + (randomPosition * 40);
         }
         this._range = 170 + (Math.random() * 40);
         this._startPoint = this._x;
@@ -320,32 +330,95 @@ var Clouds = (function () {
     }
     return Clouds;
 }());
-var Enemy = (function () {
+var Ship = (function () {
+    function Ship(isPirate) {
+        this._movingUp = false;
+        this._movingRight = true;
+        this._canonsAvailable = 10;
+        this._canons = 10;
+        this._refillSpeed = 0.05;
+        this._x = 0;
+        this._y = 0;
+        this._type = (isPirate ? 'pirate' : 'default');
+        this._shipElement = document.createElement("ship");
+        this._shipElement.className = this._type;
+        this._hitbox1 = this.createHitboxElements(1);
+        this._hitbox2 = this.createHitboxElements(2);
+        this._hitbox3 = this.createHitboxElements(3);
+    }
+    Ship.prototype._update = function (x, y) {
+        this._x = x;
+        this._y = y;
+        this._shipElement.style.left = x + "px";
+        this._shipElement.style.top = y + "px";
+    };
+    Ship.prototype._moveLeft = function () {
+        this._movingRight = false;
+        this._shipElement.className = this._type;
+    };
+    Ship.prototype._moveRight = function () {
+        this._movingRight = true;
+        this._shipElement.className = this._type + " turned";
+    };
+    Ship.prototype.refill = function () {
+        if (this._canonsAvailable >= this._canons) {
+            return;
+        }
+        this._canonsAvailable += this._refillSpeed;
+    };
+    Ship.prototype._shoot = function (shootUp) {
+        if (this._canonsAvailable <= 1.5) {
+            return;
+        }
+        if (this._type === "pirate") {
+            this.game.score.cannonsShoot++;
+        }
+        this._canonsAvailable--;
+        this.game.bullets.push(new Bullet(this.game, shootUp, this._movingRight, this));
+    };
+    Ship.prototype.shootAmount = function (shootUp, amount) {
+        for (var i = 0; i < amount; i++) {
+            this._shoot(shootUp);
+        }
+    };
+    Ship.prototype.createHitboxElements = function (nr) {
+        var hitbox = document.createElement("div");
+        hitbox.className = "hitbox_" + nr;
+        this._shipElement.appendChild(hitbox);
+        return hitbox;
+    };
+    Ship.prototype.checkHitboxes = function () {
+    };
+    return Ship;
+}());
+var Enemy = (function (_super) {
+    __extends(Enemy, _super);
     function Enemy(g) {
-        this.health = 100;
-        this.killed = false;
-        this._x = 100;
-        this._y = 100;
-        this._speed = 0.8;
-        this.goingUp = false;
-        this.goingDown = false;
-        this.goingRight = false;
-        this.goingLeft = false;
-        this.shoot = false;
-        this.game = g;
-        this.ship = new Ship(false, g);
-        this.ship.refillSpeed = 0.03;
-        this._x = (window.innerWidth - Math.floor(Math.random() * 300));
-        this._y = (window.innerHeight - Math.floor(Math.random() * 250));
-        this.ship.element.style.animationDelay = Math.random() + "s";
-        this.ship.element.style.zIndex = "70";
-        this.selfThinking();
+        var _this = _super.call(this, false) || this;
+        _this.health = 100;
+        _this.killed = false;
+        _this._x = 100;
+        _this._y = 100;
+        _this._speed = 0.8;
+        _this.goingUp = false;
+        _this.goingDown = false;
+        _this.goingRight = false;
+        _this.goingLeft = false;
+        _this.shoot = false;
+        _this.game = g;
+        _this._refillSpeed = 0.03;
+        _this._x = (window.innerWidth - Math.floor(Math.random() * 300));
+        _this._y = (window.innerHeight - Math.floor(Math.random() * 250));
+        _this._shipElement.style.animationDelay = Math.random() + "s";
+        _this._shipElement.style.zIndex = "70";
+        _this.selfThinking();
+        return _this;
     }
     Enemy.prototype.speed = function (speed) {
         this._speed = speed;
     };
     Enemy.prototype.getShip = function () {
-        return this.ship.element;
+        return this._shipElement;
     };
     Enemy.prototype.selfThinking = function () {
         var _this = this;
@@ -390,28 +463,28 @@ var Enemy = (function () {
     Enemy.prototype.update = function () {
         if (this.goingLeft) {
             this._x = this._x - this._speed;
-            this.ship.moveLeft();
+            this._moveLeft();
         }
         if (this.goingRight) {
             this._x = this._x + this._speed;
-            this.ship.moveRight();
+            this._moveRight();
         }
         if (this.goingUp) {
-            this.ship.movingUp = true;
+            this._movingUp = true;
             this._y = this._y - this._speed;
         }
         if (this.goingDown) {
-            this.ship.movingUp = false;
+            this._movingUp = false;
             this._y = this._y + this._speed;
         }
-        if (this.shoot && this.ship.canonsAvailable > 7) {
-            this.ship.shootAmount(true, 7);
+        if (this.shoot && this._canonsAvailable > 7) {
+            this.shootAmount(true, 7);
         }
-        this.ship.refill();
-        this.ship.update(this._x, this._y);
+        this.refill();
+        this._update(this._x, this._y);
     };
     Enemy.prototype.sink = function () {
-        this.ship.element.remove();
+        this._shipElement.remove();
         var getMe = this.game.screen.enemy.indexOf(this);
         this.game.screen.enemy.splice(getMe, 1);
         if (!this.killed) {
@@ -426,7 +499,7 @@ var Enemy = (function () {
         }
     };
     return Enemy;
-}());
+}(Ship));
 var Healthbar = (function () {
     function Healthbar() {
     }
@@ -467,120 +540,60 @@ var Island = (function () {
     };
     return Island;
 }());
-var Player = (function () {
+var Player = (function (_super) {
+    __extends(Player, _super);
     function Player(g) {
-        this.health = 100;
-        this._x = 100;
-        this._y = 100;
-        this._speed = 1;
-        this.ship = new Ship(true, g);
-        this.ship.element.style.zIndex = "4";
-        this.game = g;
+        var _this = _super.call(this, true) || this;
+        _this.health = 100;
+        _this._x = 100;
+        _this._y = 100;
+        _this._speed = 1;
+        _this._shipElement.style.zIndex = "4";
+        _this.game = g;
+        return _this;
     }
     Player.prototype.speed = function (speed) {
         this._speed = speed;
     };
     Player.prototype.getShip = function () {
-        return this.ship.element;
+        return this._shipElement;
     };
     Player.prototype.moveLeft = function () {
         this._x = this._x - this._speed;
-        this.ship.moveLeft();
+        this._moveLeft();
     };
     Player.prototype.moveRight = function () {
         this._x = this._x + this._speed;
-        this.ship.moveRight();
+        this._moveRight();
     };
     Player.prototype.moveUp = function () {
         if (this._y < 100) {
             return;
         }
-        this.ship.movingUp = true;
+        this._movingUp = true;
         this._y = this._y - this._speed;
     };
     Player.prototype.moveDown = function () {
         if (this._y > (window.innerHeight / 2)) {
             return;
         }
-        this.ship.movingUp = false;
+        this._movingUp = false;
         this._y = this._y + this._speed;
     };
     Player.prototype.shoot = function () {
-        if (this.ship.canonsAvailable >= 5) {
+        if (this._canonsAvailable >= 5) {
             this.game.shoutFire();
         }
-        this.ship.shoot(false);
+        this._shoot(false);
     };
     Player.prototype.update = function () {
-        this.ship.update(this._x, this._y);
+        this._update(this._x, this._y);
     };
     Player.prototype.gotShot = function () {
         this.health -= 3.5;
     };
     return Player;
-}());
-var Ship = (function () {
-    function Ship(isPirate, g) {
-        this.movingUp = false;
-        this.movingRight = true;
-        this.canonsAvailable = 10;
-        this.canons = 10;
-        this.refillSpeed = 0.05;
-        this.x = 0;
-        this.y = 0;
-        this.game = g;
-        this._type = (isPirate ? 'pirate' : 'default');
-        this.element = document.createElement("ship");
-        this.element.className = this._type;
-        this.hitbox1 = this.createHitboxElements(1);
-        this.hitbox2 = this.createHitboxElements(2);
-        this.hitbox3 = this.createHitboxElements(3);
-    }
-    Ship.prototype.update = function (x, y) {
-        this.x = x;
-        this.y = y;
-        this.element.style.left = x + "px";
-        this.element.style.top = y + "px";
-    };
-    Ship.prototype.moveLeft = function () {
-        this.movingRight = false;
-        this.element.className = this._type;
-    };
-    Ship.prototype.moveRight = function () {
-        this.movingRight = true;
-        this.element.className = this._type + " turned";
-    };
-    Ship.prototype.refill = function () {
-        if (this.canonsAvailable >= this.canons) {
-            return;
-        }
-        this.canonsAvailable += this.refillSpeed;
-    };
-    Ship.prototype.shoot = function (shootUp) {
-        if (this.canonsAvailable <= 1.5) {
-            return;
-        }
-        if (this._type === "pirate") {
-            this.game.score.cannonsShoot++;
-        }
-        this.canonsAvailable--;
-        this.game.bullets.push(new Bullet(this.game, shootUp, this.movingRight, this));
-    };
-    Ship.prototype.shootAmount = function (shootUp, amount) {
-        for (var i = 0; i < amount; i++) {
-            this.shoot(shootUp);
-        }
-    };
-    Ship.prototype.createHitboxElements = function (nr) {
-        var hitbox = document.createElement("div");
-        hitbox.className = "hitbox_" + nr;
-        this.element.appendChild(hitbox);
-        return hitbox;
-    };
-    Ship.prototype.checkHitboxes = function () {
-    };
-    return Ship;
-}());
+}(Ship));
 var GameOverScreen = (function () {
     function GameOverScreen(g) {
         var _this = this;
@@ -690,25 +703,25 @@ var PlayScreen = (function () {
             this.closeScene();
             return;
         }
-        this.player.ship.refill();
-        var available = Math.floor(this.player.ship.canonsAvailable);
+        this.player.refill();
+        var available = Math.floor(this.player._canonsAvailable);
         this.canonsLeft.innerHTML = (available < 10 ? "0" + String(available) : available) + " kanonnen over";
         for (var bullets = 0; bullets < this.game.bullets.length; bullets++) {
             this.game.bullets[bullets].update();
             if (this.game.bullets[bullets]._vissible) {
                 if (this.game.bullets[bullets].isEnemyBullet) {
-                    if (this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox1.getBoundingClientRect()) ||
-                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox2.getBoundingClientRect()) ||
-                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox3.getBoundingClientRect())) {
+                    if (this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player._hitbox1.getBoundingClientRect()) ||
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player._hitbox2.getBoundingClientRect()) ||
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player._hitbox3.getBoundingClientRect())) {
                         this.player.gotShot();
                         this.game.bullets[bullets].boom();
                     }
                 }
                 else {
                     for (var enemy = 0; enemy < this.enemy.length; enemy++) {
-                        if (this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox1.getBoundingClientRect()) ||
-                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox2.getBoundingClientRect()) ||
-                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox3.getBoundingClientRect())) {
+                        if (this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy]._hitbox1.getBoundingClientRect()) ||
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy]._hitbox2.getBoundingClientRect()) ||
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy]._hitbox3.getBoundingClientRect())) {
                             this.enemy[enemy].gotShot();
                             this.game.bullets[bullets].boom();
                         }

@@ -1,20 +1,21 @@
-class Player
+///<reference path="Ship.ts" />
+
+class Player extends Ship
 {
     health = 100;
-    ship:Ship;
 
     _x:number = 100;
     _y:number = 100;
     _speed:number = 1;
 
-    game:Game;
+    protected game:Game;
 
     constructor(g:Game)
     {
-        this.ship = new Ship(true, g);
+        super(true);
 
         // Set z-index
-        this.ship.element.style.zIndex = "4";
+        this._shipElement.style.zIndex = "4";
 
         this.game = g;
     }
@@ -26,19 +27,19 @@ class Player
 
     getShip()
     {
-        return this.ship.element;
+        return this._shipElement;
     }
 
     moveLeft()
     {
         this._x = this._x - this._speed;
-        this.ship.moveLeft();
+        this._moveLeft();
     }
 
     moveRight()
     {
         this._x = this._x + this._speed;
-        this.ship.moveRight();
+        this._moveRight();
     }
 
     moveUp()
@@ -47,7 +48,7 @@ class Player
             return;
         }
 
-        this.ship.movingUp = true;
+        this._movingUp = true;
         this._y = this._y - this._speed;
     }
 
@@ -57,22 +58,22 @@ class Player
             return;
         }
 
-        this.ship.movingUp = false;
+        this._movingUp = false;
         this._y = this._y + this._speed;
     }
 
     shoot()
     {
-        if(this.ship.canonsAvailable >= 5)
+        if(this._canonsAvailable >= 5)
         {
             this.game.shoutFire();
         }
 
-        this.ship.shoot(false);
+        this._shoot(false);
     }
     update()
     {
-        this.ship.update(this._x, this._y);
+        this._update(this._x, this._y);
     }
 
     gotShot()

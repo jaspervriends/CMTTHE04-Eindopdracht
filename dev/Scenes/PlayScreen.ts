@@ -116,9 +116,9 @@ class PlayScreen {
         }
 
         // Refill the ship
-        this.player.ship.refill();
+        this.player.refill();
 
-        let available = Math.floor(this.player.ship.canonsAvailable);
+        let available = Math.floor(this.player._canonsAvailable);
         this.canonsLeft.innerHTML = (available < 10 ? "0" + String(available) : available) +  " kanonnen over";
 
         for(let bullets = 0; bullets < this.game.bullets.length; bullets++)
@@ -129,9 +129,9 @@ class PlayScreen {
                 if(this.game.bullets[bullets].isEnemyBullet) 
                 {
                     if(
-                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox1.getBoundingClientRect()) ||
-                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox2.getBoundingClientRect()) ||
-                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player.ship.hitbox3.getBoundingClientRect())
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player._hitbox1.getBoundingClientRect()) ||
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player._hitbox2.getBoundingClientRect()) ||
+                        this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.player._hitbox3.getBoundingClientRect())
                     )
                     {
                         this.player.gotShot();
@@ -140,9 +140,9 @@ class PlayScreen {
                 }else{
                     for(let enemy = 0; enemy < this.enemy.length; enemy++) {
                         if(
-                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox1.getBoundingClientRect()) ||
-                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox2.getBoundingClientRect()) ||
-                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy].ship.hitbox3.getBoundingClientRect())
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy]._hitbox1.getBoundingClientRect()) ||
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy]._hitbox2.getBoundingClientRect()) ||
+                            this.checkCollision(this.game.bullets[bullets].element.getBoundingClientRect(), this.enemy[enemy]._hitbox3.getBoundingClientRect())
                         )
                         {
                             this.enemy[enemy].gotShot();
